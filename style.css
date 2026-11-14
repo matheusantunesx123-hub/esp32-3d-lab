@@ -1,4 +1,4 @@
-/* Custom Styling for ESP32 3D Lab Ultra-Real */
+/* Custom Styling for ESP32 3D Lab Ultra-Real v2.5 */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -17,6 +17,8 @@
 canvas {
   display: block;
   outline: none;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .glow-cyan {
