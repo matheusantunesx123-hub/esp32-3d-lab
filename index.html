@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESP32 & Módulos 3D Lab | Banco de Dados & Simulador</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Three.js & OrbitControls CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans select-none overflow-x-hidden">
+
+  <!-- Top Navigation Header -->
+  <header class="h-16 border-b border-slate-800 bg-slate-900/80 backdrop-blur-md px-6 flex items-center justify-between z-20 sticky top-0">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 text-white font-bold text-lg">
+        <i class="fa-solid fa-microchip"></i>
+      </div>
+      <div>
+        <h1 class="font-bold text-lg leading-tight flex items-center gap-2">
+          <span>ESP32 3D Lab & Studio</span>
+          <span class="text-xs px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800">Web Maker v1.0</span>
+        </h1>
+        <p class="text-xs text-slate-400">Banco de Dados de Módulos, Montagem Física 3D & Simulador</p>
+      </div>
+    </div>
+
+    <!-- Central Tabs -->
+    <div class="hidden md:flex items-center bg-slate-950/70 p-1 rounded-xl border border-slate-800 text-sm">
+      <button id="tab-btn-3d" onclick="switchView('3d')" class="px-4 py-1.5 rounded-lg font-medium transition-all duration-200 bg-cyan-500 text-white shadow">
+        <i class="fa-solid fa-cube mr-1.5"></i> Visualizador 3D
+      </button>
+      <button id="tab-btn-wiring" onclick="switchView('wiring')" class="px-4 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white transition-all duration-200">
+        <i class="fa-solid fa-diagram-project mr-1.5"></i> Fiação no Mundo Real
+      </button>
+      <button id="tab-btn-test" onclick="switchView('test')" class="px-4 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white transition-all duration-200">
+        <i class="fa-solid fa-play mr-1.5"></i> Testar & Simular
+      </button>
+      <button id="tab-btn-db" onclick="switchView('db')" class="px-4 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white transition-all duration-200">
+        <i class="fa-solid fa-database mr-1.5"></i> Banco de Módulos
+      </button>
+    </div>
+
+    <!-- Actions / Export -->
+    <div class="flex items-center gap-2">
+      <button onclick="openNewModuleModal()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-cyan-500/30 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+        <i class="fa-solid fa-plus"></i> Novo Módulo
+      </button>
+      <button onclick="exportProjectData()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium flex items-center gap-1.5 transition" title="Exportar Backup JSON">
+        <i class="fa-solid fa-download"></i> Exportar
+      </button>
+      <button onclick="resetCameraView()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-300 text-xs transition" title="Resetar Câmera 3D">
+        <i class="fa-solid fa-arrows-rotate"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workspace Layout -->
+  <div class="flex-1 flex overflow-hidden relative">
+
+    <!-- Left Sidebar: Component Catalog & Project Config -->
+    <aside class="w-80 md:w-88 border-r border-slate-800 bg-slate-900/60 backdrop-blur-md flex flex-col z-10 overflow-y-auto">
+      
+      <!-- MCU Selector Box -->
+      <div class="p-4 border-b border-slate-800 bg-slate-950/40">
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-microchip text-cyan-400"></i> Microcontrolador
+          </label>
+          <span class="text-[10px] bg-emerald-950 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-800">Ativo</span>
+        </div>
+        <select id="mcu-select" onchange="onMcuChange(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-cyan-300 font-medium focus:outline-none focus:border-cyan-500 transition">
+          <option value="esp32_wroom_30">ESP32 DevKit V1 (30 Pinos)</option>
+          <option value="esp32_wroom_38">ESP32 DevKit V1 (38 Pinos)</option>
+          <option value="esp8266_nodemcu">ESP8266 NodeMCU V3 (ESP-12E)</option>
+          <option value="esp8266_d1mini">ESP8266 D1 Mini</option>
+        </select>
+        <p class="text-[11px] text-slate-400 mt-1.5 flex items-center gap-1">
+          <i class="fa-solid fa-bolt text-yellow-400"></i> Tensão lógica: 3.3V | WiFi + Bluetooth Integrado
+        </p>
+      </div>
+
+      <!-- Attached Modules in Current Assembly -->
+      <div class="p-4 border-b border-slate-800">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+            <i class="fa-solid fa-puzzle-piece text-cyan-400"></i> Módulos Conectados (<span id="attached-count">0</span>)
+          </h3>
+          <button onclick="clearAttachedModules()" class="text-[11px] text-rose-400 hover:text-rose-300">Limpar</button>
+        </div>
+        <div id="attached-modules-list" class="space-y-2 min-h-[60px]">
+          <!-- Dynamic Attached Modules -->
+        </div>
+      </div>
+
+      <!-- Module Catalog / Database Drawer -->
+      <div class="p-4 flex-1 flex flex-col">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+            <i class="fa-solid fa-boxes-stacked text-cyan-400"></i> Banco de Módulos
+          </h3>
+          <span class="text-[10px] text-slate-500">Clique para adicionar</span>
+        </div>
+
+        <!-- Filter Search & Category -->
+        <div class="mb-3">
+          <div class="relative">
+            <i class="fa-solid fa-search absolute left-3 top-2.5 text-xs text-slate-500"></i>
+            <input type="text" id="catalog-search" oninput="filterCatalog()" placeholder="Buscar sensor, relé, tela..." class="w-full bg-slate-950 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+          </div>
+        </div>
+
+        <!-- Catalog List -->
+        <div id="catalog-list" class="space-y-2 flex-1 overflow-y-auto pr-1">
+          <!-- Populated from Database -->
+        </div>
+      </div>
+    </aside>
+
+    <!-- Center & Right: Main Interactive Area -->
+    <main class="flex-1 flex flex-col relative bg-slate-950">
+
+      <!-- VIEW 1: 3D Canvas View -->
+      <div id="view-3d" class="absolute inset-0 flex flex-col">
+        <!-- 3D Canvas -->
+        <div id="canvas-container" class="w-full h-full relative cursor-grab active:cursor-grabbing">
+          <!-- 3D HUD / Overlay Controls -->
+          <div class="absolute top-4 left-4 z-10 flex flex-wrap gap-2">
+            <div class="bg-slate-900/85 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-800 text-xs flex items-center gap-2 shadow-lg">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span id="hud-mcu-name" class="font-bold text-cyan-300">ESP32 DevKit V1</span>
+            </div>
+
+            <button onclick="toggleBreadboard()" id="btn-toggle-bb" class="bg-slate-900/85 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-xl border border-slate-800 text-xs flex items-center gap-1.5 backdrop-blur-md transition shadow-lg">
+              <i class="fa-solid fa-grip"></i> <span id="lbl-toggle-bb">Protoboard: Ativa</span>
+            </button>
+
+            <button onclick="toggleWires()" id="btn-toggle-wires" class="bg-slate-900/85 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-xl border border-slate-800 text-xs flex items-center gap-1.5 backdrop-blur-md transition shadow-lg">
+              <i class="fa-solid fa-bezier-curve text-yellow-400"></i> Fios 3D: <span id="lbl-toggle-wires">Ligados</span>
+            </button>
+
+            <button onclick="toggleAutoRotate()" id="btn-autorotate" class="bg-slate-900/85 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-xl border border-slate-800 text-xs flex items-center gap-1.5 backdrop-blur-md transition shadow-lg">
+              <i class="fa-solid fa-rotate"></i> Giro 360°
+            </button>
+          </div>
+
+          <!-- Bottom 3D Help Overlay -->
+          <div class="absolute bottom-4 left-4 z-10 bg-slate-900/80 backdrop-blur-md px-3 py-2 rounded-xl border border-slate-800 text-[11px] text-slate-400 flex items-center gap-4 shadow-lg pointer-events-none">
+            <span><i class="fa-solid fa-computer-mouse text-cyan-400 mr-1"></i> Botão Esquerdo: Girar 3D</span>
+            <span><i class="fa-solid fa-arrows-up-down text-cyan-400 mr-1"></i> Scroll: Zoom</span>
+            <span><i class="fa-solid fa-hand-pointer text-cyan-400 mr-1"></i> Passe o mouse nos pinos</span>
+          </div>
+
+          <!-- Pin Hover Info Bubble -->
+          <div id="pin-hover-card" class="absolute hidden z-20 pointer-events-none bg-slate-900/95 border border-cyan-500/50 rounded-xl p-3 shadow-2xl backdrop-blur-md text-xs w-64 transform -translate-x-1/2 -translate-y-full mb-3">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-1.5 mb-1.5">
+              <span id="hover-pin-name" class="font-bold text-cyan-400 text-sm">GPIO 2</span>
+              <span id="hover-pin-type" class="text-[10px] px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">Digital / PWM</span>
+            </div>
+            <div class="space-y-1 text-slate-300 text-[11px]">
+              <div><span class="text-slate-500">Função:</span> <span id="hover-pin-desc">LED interno / Boot</span></div>
+              <div><span class="text-slate-500">Nível Lógico:</span> <span id="hover-pin-volt" class="text-emerald-400 font-semibold">3.3V Máx</span></div>
+              <div><span class="text-slate-500">Status:</span> <span id="hover-pin-status" class="text-slate-400">Livre</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating Pinout Inspector Drawer (Right bottom) -->
+        <div id="pinout-inspector" class="absolute top-4 right-4 w-72 bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-2xl p-4 shadow-2xl z-10 max-h-[calc(100%-2rem)] overflow-y-auto">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-circle-info text-cyan-400"></i> Pinagem & Detalhes
+            </h4>
+            <span id="inspector-mcu-badge" class="text-[10px] bg-cyan-950 text-cyan-400 px-2 py-0.5 rounded-full border border-cyan-800">30 Pinos</span>
+          </div>
+
+          <div id="inspector-body" class="text-xs space-y-2.5">
+            <p class="text-slate-400 text-[11px]">Passe o mouse ou selecione um pino na placa 3D para inspecionar os barramentos (I2C, SPI, ADC, DAC, Touch, UART).</p>
+            <div class="grid grid-cols-2 gap-1.5 pt-1 text-[11px]">
+              <div class="bg-slate-950 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-500 block text-[10px]">Barramento I2C</span>
+                <span class="font-semibold text-cyan-300">SDA: GPIO 21<br>SCL: GPIO 22</span>
+              </div>
+              <div class="bg-slate-950 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-500 block text-[10px]">Barramento SPI</span>
+                <span class="font-semibold text-cyan-300">MOSI: 23 | MISO: 19<br>SCK: 18 | CS: 5</span>
+              </div>
+              <div class="bg-slate-950 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-500 block text-[10px]">ADC (Analógico)</span>
+                <span class="font-semibold text-emerald-300">ADC1: GPIO 32-39<br>(WiFi Seguro)</span>
+              </div>
+              <div class="bg-slate-950 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-500 block text-[10px]">Alimentação</span>
+                <span class="font-semibold text-amber-300">VIN: 5V (USB)<br>3V3: Regulada</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 2: Physical Wiring Guide (Como montar no mundo real) -->
+      <div id="view-wiring" class="absolute inset-0 hidden overflow-y-auto p-6 md:p-10 bg-slate-950">
+        <div class="max-w-4xl mx-auto space-y-6">
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                  <i class="fa-solid fa-screwdriver-wrench text-cyan-400"></i> Guia Físico de Montagem no Mundo Real
+                </h2>
+                <p class="text-xs text-slate-400 mt-1">Conecte cada pino exatamente como descrito nesta tabela usando cabos jumper.</p>
+              </div>
+              <button onclick="printWiringGuide()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg border border-slate-700 flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-print"></i> Imprimir Guia
+              </button>
+            </div>
+
+            <!-- Caution Banner -->
+            <div class="bg-amber-950/40 border border-amber-800/60 rounded-xl p-3.5 mb-6 flex items-start gap-3 text-xs text-amber-200">
+              <i class="fa-solid fa-triangle-exclamation text-amber-400 text-base mt-0.5"></i>
+              <div>
+                <span class="font-bold">Regra de Segurança Física:</span> O ESP32 trabalha com nível lógico de **3.3V**. Nunca alimente os pinos GPIO diretamente com 5V sem divisor de tensão. Sempre confira o GND compartilhado!
+              </div>
+            </div>
+
+            <!-- Dynamic Wiring Table -->
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-800 text-slate-400 text-[11px] uppercase tracking-wider bg-slate-950/50">
+                    <th class="py-3 px-3">Fio / Cor</th>
+                    <th class="py-3 px-3">Módulo de Origem</th>
+                    <th class="py-3 px-3">Pino no Módulo</th>
+                    <th class="py-3 px-3">Conectar no ESP32</th>
+                    <th class="py-3 px-3">Tipo de Sinal</th>
+                    <th class="py-3 px-3 text-right">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="wiring-table-body" class="divide-y divide-slate-800/60 font-mono">
+                  <!-- Generated dynamically -->
+                </tbody>
+              </table>
+            </div>
+            
+            <div id="wiring-empty-state" class="py-12 text-center text-slate-500 text-xs">
+              <i class="fa-solid fa-plug text-3xl mb-2 text-slate-600 block"></i>
+              Nenhum módulo adicionado ainda. Escolha módulos no menu à esquerda para gerar o mapa de fios!
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 3: Test & Simulate Console -->
+      <div id="view-test" class="absolute inset-0 hidden overflow-y-auto p-6 md:p-10 bg-slate-950">
+        <div class="max-w-5xl mx-auto space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Interactive Virtual Hardware Tester -->
+            <div class="lg:col-span-1 bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                <h3 class="font-bold text-sm text-white flex items-center gap-2">
+                  <i class="fa-solid fa-gamepad text-cyan-400"></i> Testador Virtual
+                </h3>
+                <span id="virtual-power-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">Desligado</span>
+              </div>
+
+              <!-- Power On/Off toggle -->
+              <div class="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-slate-800 mb-4">
+                <span class="text-xs font-medium text-slate-300">Alimentação Virtual (5V USB)</span>
+                <button id="btn-virtual-power" onclick="toggleVirtualPower()" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold transition">
+                  LIGAR
+                </button>
+              </div>
+
+              <!-- Interactive Controls for Attached Modules -->
+              <div class="flex-1 space-y-3" id="virtual-controls-container">
+                <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800">
+                  <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-xs font-semibold text-slate-300">LED Onboard (GPIO 2)</span>
+                    <button onclick="toggleOnboardLed()" class="px-2 py-0.5 bg-slate-800 text-cyan-400 rounded text-xs">Alternar</button>
+                  </div>
+                  <div class="flex items-center gap-2 text-[11px] text-slate-400">
+                    <span id="virtual-led-status" class="w-2.5 h-2.5 rounded-full bg-slate-700 inline-block"></span>
+                    <span id="virtual-led-text">Apagado</span>
+                  </div>
+                </div>
+
+                <div id="virtual-modules-controls" class="space-y-3">
+                  <!-- Injected based on attached modules -->
+                </div>
+              </div>
+
+              <!-- Open in Wokwi simulator button -->
+              <div class="mt-4 pt-4 border-t border-slate-800">
+                <button onclick="openWokwiSimulation()" class="w-full py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-cyan-600/20 flex items-center justify-center gap-2 transition">
+                  <i class="fa-solid fa-up-right-from-square"></i> Abrir Simulação Online no Wokwi
+                </button>
+                <p class="text-[10px] text-slate-500 text-center mt-1.5">100% Gratuito no navegador, com código e circuito completo!</p>
+              </div>
+            </div>
+
+            <!-- Generated Firmware Code (Arduino / C++) -->
+            <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                  <i class="fa-solid fa-code text-cyan-400"></i>
+                  <h3 class="font-bold text-sm text-white">Código Arduino / C++ Gerado</h3>
+                </div>
+                <button onclick="copyGeneratedCode()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-cyan-400 rounded-lg text-xs font-medium border border-cyan-800/40 flex items-center gap-1.5 transition">
+                  <i class="fa-solid fa-copy"></i> Copiar Código
+                </button>
+              </div>
+
+              <div class="relative flex-1 bg-slate-950 rounded-xl border border-slate-800 overflow-hidden flex flex-col">
+                <div class="bg-slate-900 px-3 py-1.5 text-[11px] text-slate-400 flex items-center justify-between border-b border-slate-800 font-mono">
+                  <span>main.cpp (Pronto para gravar no ESP32)</span>
+                  <span class="text-emerald-400">Pronto</span>
+                </div>
+                <pre class="p-4 text-xs font-mono text-cyan-300 overflow-auto flex-1 leading-relaxed selection:bg-cyan-900"><code id="code-output">// Conecte os módulos e o código será gerado aqui automaticamente!
+void setup() {
+  Serial.begin(115200);
+  Serial.println("ESP32 Inicializado com sucesso!");
+}
+
+void loop() {
+  delay(1000);
+}</code></pre>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 4: Database Catalog Explorer -->
+      <div id="view-db" class="absolute inset-0 hidden overflow-y-auto p-6 md:p-10 bg-slate-950">
+        <div class="max-w-5xl mx-auto space-y-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-database text-cyan-400"></i> Catálogo Completo de Componentes & Sensores
+              </h2>
+              <p class="text-xs text-slate-400 mt-1">Gerencie a biblioteca de sensores, atuadores, displays e pinagens.</p>
+            </div>
+            <button onclick="openNewModuleModal()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-cyan-600/20 transition">
+              <i class="fa-solid fa-plus"></i> Cadastrar Novo Componente
+            </button>
+          </div>
+
+          <div id="database-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Dynamic Database Cards -->
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Modal: Cadastrar Novo Módulo -->
+  <div id="modal-new-module" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="font-bold text-base text-white flex items-center gap-2">
+          <i class="fa-solid fa-plus-circle text-cyan-400"></i> Cadastrar Novo Módulo no Banco
+        </h3>
+        <button onclick="closeNewModuleModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Nome do Módulo / Sensor</label>
+          <input type="text" id="new-mod-name" placeholder="Ex: Sensor de Gás MQ-2" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-cyan-500">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Categoria</label>
+            <select id="new-mod-cat" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-cyan-500">
+              <option value="sensor">Sensor</option>
+              <option value="atuador">Atuador / Relé / Motor</option>
+              <option value="display">Display / Tela</option>
+              <option value="comunicacao">Comunicação / Rede</option>
+              <option value="outro">Outro</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Tensão de Alimentação</label>
+            <select id="new-mod-voltage" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-cyan-500">
+              <option value="3.3V">3.3V (Compatível Direto)</option>
+              <option value="5V">5V (Alimentar via VIN)</option>
+              <option value="3.3V - 5V">Ambos (3.3V a 5V)</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Pinos do Módulo (separados por vírgula)</label>
+          <input type="text" id="new-mod-pins" placeholder="Ex: VCC, GND, DO (Digital), AO (Analógico)" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-cyan-500">
+        </div>
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Descrição / Instrução de Uso</label>
+          <textarea id="new-mod-desc" rows="2" placeholder="Ex: Detecta GLP, fumaça e álcool. Conectar AO ao pino ADC do ESP32." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-cyan-500"></textarea>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+        <button onclick="closeNewModuleModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-xl font-medium transition">Cancelar</button>
+        <button onclick="saveNewModule()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs rounded-xl font-bold transition">Salvar no Banco</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 border border-cyan-500 text-white text-xs px-4 py-3 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
+    <i class="fa-solid fa-circle-check text-cyan-400 text-sm"></i>
+    <span id="toast-msg">Mensagem de alerta</span>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
