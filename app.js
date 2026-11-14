@@ -1,19 +1,12 @@
-// ESP32 & Módulos 3D Lab - Ultra Real Engine & Interactive Teaching Guide
+// ESP32 & Módulos 3D Lab v3.0 - Ultra-Fiel 1:1, Memória Persistente & Multi-Painel
 
-// --- Microcontroller Definitions & Pinouts ---
+// --- Microcontroller Definitions & Precise Physical Pin Maps ---
 const MCUS = {
   esp32_wroom_30: {
     id: 'esp32_wroom_30',
     name: 'ESP32 DevKit V1 (30 Pinos)',
     pinsCount: 30,
     logicVoltage: '3.3V',
-    powerPins: ['VIN (5V)', '3V3', 'GND', 'GND'],
-    i2c: { sda: 'GPIO 21', scl: 'GPIO 22' },
-    spi: { mosi: 'GPIO 23', miso: 'GPIO 19', sck: 'GPIO 18', cs: 'GPIO 5' },
-    uart: { tx: 'GPIO 1 (TX0)', rx: 'GPIO 3 (RX0)' },
-    adc1: ['GPIO 36 (VP)', 'GPIO 39 (VN)', 'GPIO 34', 'GPIO 35', 'GPIO 32', 'GPIO 33'],
-    dac: ['GPIO 25 (DAC1)', 'GPIO 26 (DAC2)'],
-    onboardLed: 'GPIO 2',
     leftPins: ['EN', 'VP', 'VN', 'D34', 'D35', 'D32', 'D33', 'D25', 'D26', 'D27', 'D14', 'D12', 'D13', 'GND', 'VIN'],
     rightPins: ['D23', 'D22', 'TX0', 'RX0', 'D21', 'D19', 'D18', 'D5', 'TX2', 'RX2', 'D4', 'D2', 'D15', 'GND', '3V3']
   },
@@ -22,10 +15,6 @@ const MCUS = {
     name: 'ESP32 DevKit V1 (38 Pinos)',
     pinsCount: 38,
     logicVoltage: '3.3V',
-    powerPins: ['VIN (5V)', '3V3', 'GND'],
-    i2c: { sda: 'GPIO 21', scl: 'GPIO 22' },
-    spi: { mosi: 'GPIO 23', miso: 'GPIO 19', sck: 'GPIO 18', cs: 'GPIO 5' },
-    onboardLed: 'GPIO 2',
     leftPins: ['3V3', 'EN', 'VP', 'VN', 'D34', 'D35', 'D32', 'D33', 'D25', 'D26', 'D27', 'D14', 'D12', 'GND', 'D13', 'D9', 'D10', 'D11', 'VIN'],
     rightPins: ['GND', 'D23', 'D22', 'TX0', 'RX0', 'D21', 'D19', 'D18', 'D5', 'TX2', 'RX2', 'D4', 'D2', 'D15', 'D8', 'D7', 'D6', 'CLK', 'CMD']
   },
@@ -34,10 +23,6 @@ const MCUS = {
     name: 'ESP8266 NodeMCU V3 (ESP-12E)',
     pinsCount: 30,
     logicVoltage: '3.3V',
-    powerPins: ['VIN (5V)', '3V3', 'GND'],
-    i2c: { sda: 'D2 (GPIO 4)', scl: 'D1 (GPIO 5)' },
-    spi: { mosi: 'D7 (GPIO 13)', miso: 'D6 (GPIO 12)', sck: 'D5 (GPIO 14)', cs: 'D8 (GPIO 15)' },
-    onboardLed: 'D4 (GPIO 2)',
     leftPins: ['A0', 'RSV', 'RSV', 'SD3', 'SD2', 'SD1', 'CMD', 'SD0', 'CLK', 'GND', '3V3', 'EN', 'RST', 'GND', 'VIN'],
     rightPins: ['D0', 'D1', 'D2', 'D3', 'D4', '3V3', 'GND', 'D5', 'D6', 'D7', 'D8', 'RX', 'TX', 'GND', '3V3']
   },
@@ -46,15 +31,12 @@ const MCUS = {
     name: 'ESP8266 D1 Mini',
     pinsCount: 16,
     logicVoltage: '3.3V',
-    powerPins: ['5V', '3V3', 'GND'],
-    i2c: { sda: 'D2 (GPIO 4)', scl: 'D1 (GPIO 5)' },
-    onboardLed: 'D4 (GPIO 2)',
     leftPins: ['RST', 'A0', 'D0', 'D5', 'D6', 'D7', 'D8', '3V3'],
     rightPins: ['TX', 'RX', 'D1', 'D2', 'D3', 'D4', 'GND', '5V']
   }
 };
 
-// --- Default Database of Sensors & Modules with Educational Tutorials ---
+// --- Module Database with Exact Pin Matchings & Step-by-Step Educational Guides ---
 const DEFAULT_MODULE_DATABASE = [
   {
     id: 'rele_1ch',
@@ -64,45 +46,45 @@ const DEFAULT_MODULE_DATABASE = [
     color: '#3b82f6',
     icon: 'fa-toggle-on',
     pins: ['VCC', 'GND', 'IN'],
-    defaultEspPins: { 'VCC': 'VIN (5V)', 'GND': 'GND', 'IN': 'GPIO 23' },
+    defaultEspPins: { 'VCC': 'VIN', 'GND': 'GND', 'IN': 'D23' },
     wireColors: { 'VCC': '#ef4444', 'GND': '#0f172a', 'IN': '#eab308' },
-    desc: 'Permite acionar cargas de alta tensão (lâmpadas, motores, fechaduras) via sinal digital.',
+    desc: 'Permite acionar lâmpadas e cargas AC/DC com isolamento óptico.',
     tutorialSteps: [
       {
-        title: 'Posicionamento Físico',
+        title: 'Posicionamento Mecânico',
         wireName: 'Encaixe na Bancada',
         wireColor: '#3b82f6',
         sourcePin: 'Bancada',
         destPin: 'Ao lado do ESP32',
-        wireType: 'Fixação Mecânica',
-        explanation: 'Posicione o módulo relé deixando cerca de 5cm de distância do ESP32 na bancada ou protoboard. Isso garante espaço livre para os cabos jumper e previne ruídos eletromagnéticos da bobina do relé.'
+        wireType: 'Fixação Física',
+        explanation: 'Posicione o módulo relé deixando cerca de 5cm de folga do ESP32. Isso evita interferência eletromagnética gerada quando a bobina comuta cargas altas.'
       },
       {
         title: 'Alimentação Positiva (VCC)',
         wireName: 'Fio Vermelho (VCC)',
         wireColor: '#ef4444',
-        sourcePin: 'ESP32: VIN (5V)',
-        destPin: 'Relé: VCC',
+        sourcePin: 'ESP32: Pino VIN (5V)',
+        destPin: 'Relé: Pino VCC',
         wireType: 'Macho-Fêmea',
-        explanation: 'A bobina mecânica do relé precisa de 5V para atracar com força total. Conecte o fio vermelho do pino VIN do ESP32 (que recebe 5V direto da USB) ao pino VCC do relé.'
+        explanation: 'O relé precisa de 5V na bobina. Conecte o fio vermelho do pino VIN do ESP32 (último pino da esquerda) ao pino VCC do relé.'
       },
       {
-        title: 'Aterramento (GND)',
+        title: 'Aterramento Comum (GND)',
         wireName: 'Fio Preto (GND)',
         wireColor: '#0f172a',
-        sourcePin: 'ESP32: GND',
-        destPin: 'Relé: GND',
+        sourcePin: 'ESP32: Pino GND',
+        destPin: 'Relé: Pino GND',
         wireType: 'Macho-Fêmea',
-        explanation: 'Conecte o fio preto do pino GND do ESP32 ao pino GND do módulo relé. O terra comum é essencial para fechar o circuito elétrico e garantir o nível de 0V.'
+        explanation: 'Conecte o fio preto do pino GND do ESP32 (ao lado do VIN) ao pino GND do relé para fechar a referência de terra de 0V.'
       },
       {
-        title: 'Sinal de Controle Digital (IN)',
+        title: 'Controle Digital de Acionamento (IN)',
         wireName: 'Fio Amarelo (Sinal)',
         wireColor: '#eab308',
-        sourcePin: 'ESP32: GPIO 23',
-        destPin: 'Relé: IN',
+        sourcePin: 'ESP32: Pino D23 (GPIO 23)',
+        destPin: 'Relé: Pino IN',
         wireType: 'Macho-Fêmea',
-        explanation: 'Conecte o fio amarelo do pino GPIO 23 do ESP32 ao pino IN do relé. Quando o seu código mandar sinal HIGH (3.3V), o relé atravará ligando a carga conectada.'
+        explanation: 'Conecte o fio amarelo do pino D23 (primeiro pino da direita) ao pino IN do relé. Ao enviar digitalWrite(23, HIGH) no código, o relé liga!'
       }
     ]
   },
@@ -114,45 +96,45 @@ const DEFAULT_MODULE_DATABASE = [
     color: '#10b981',
     icon: 'fa-temperature-half',
     pins: ['VCC', 'DATA', 'GND'],
-    defaultEspPins: { 'VCC': '3V3', 'GND': 'GND', 'DATA': 'GPIO 4' },
+    defaultEspPins: { 'VCC': '3V3', 'GND': 'GND', 'DATA': 'D4' },
     wireColors: { 'VCC': '#ef4444', 'GND': '#0f172a', 'DATA': '#06b6d4' },
-    desc: 'Mede temperatura (-40 a 80°C) e umidade com alta precisão digital.',
+    desc: 'Mede temperatura (-40 a 80°C) e umidade com protocolo digital de 1 via.',
     tutorialSteps: [
       {
-        title: 'Posicionamento Físico',
+        title: 'Posicionamento do Sensor',
         wireName: 'Encaixe na Protoboard',
         wireColor: '#10b981',
         sourcePin: 'Protoboard',
-        destPin: 'Trilhas E-J',
+        destPin: 'Ranhuras Frontais',
         wireType: 'Encaixe 4 Pinos',
-        explanation: 'Encaixe o sensor DHT22 verticalmente na protoboard, com as ranhuras de ventilação viradas para frente para permitir a circulação de ar.'
+        explanation: 'Encaixe o sensor DHT22 na protoboard com a grade de ventilação branca virada para frente.'
       },
       {
         title: 'Alimentação 3.3V (VCC)',
         wireName: 'Fio Vermelho (3.3V)',
         wireColor: '#ef4444',
-        sourcePin: 'ESP32: 3V3',
+        sourcePin: 'ESP32: Pino 3V3',
         destPin: 'DHT22: Pino 1 (VCC)',
         wireType: 'Macho-Macho',
-        explanation: 'O DHT22 trabalha perfeitamente com a tensão nativa de 3.3V do ESP32. Ligue o pino 3V3 do ESP ao Pino 1 (VCC) do sensor.'
-      },
-      {
-        title: 'Linha de Dados Digital',
-        wireName: 'Fio Azul Claro (DATA)',
-        wireColor: '#06b6d4',
-        sourcePin: 'ESP32: GPIO 4',
-        destPin: 'DHT22: Pino 2 (DATA)',
-        wireType: 'Macho-Macho',
-        explanation: 'Ligue o fio azul do GPIO 4 do ESP ao Pino 2 (DATA) do sensor. A biblioteca lê os pulsos digitais de temperatura e umidade através desta linha.'
+        explanation: 'Ligue o fio vermelho do pino 3V3 do ESP32 (último pino da direita) ao Pino 1 (VCC) do sensor.'
       },
       {
         title: 'Aterramento (GND)',
         wireName: 'Fio Preto (GND)',
         wireColor: '#0f172a',
-        sourcePin: 'ESP32: GND',
+        sourcePin: 'ESP32: Pino GND',
         destPin: 'DHT22: Pino 4 (GND)',
         wireType: 'Macho-Macho',
-        explanation: 'Ligue o fio preto do pino GND do ESP ao Pino 4 (GND) do sensor. (Nota: o Pino 3 do DHT22 não é conectado / NC).'
+        explanation: 'Ligue o fio preto do pino GND do ESP32 ao Pino 4 (GND) do sensor.'
+      },
+      {
+        title: 'Linha Digital de Dados (DATA)',
+        wireName: 'Fio Azul Claro (DATA)',
+        wireColor: '#06b6d4',
+        sourcePin: 'ESP32: Pino D4 (GPIO 4)',
+        destPin: 'DHT22: Pino 2 (DATA)',
+        wireType: 'Macho-Macho',
+        explanation: 'Ligue o fio azul do pino D4 do ESP32 ao Pino 2 (DATA) do sensor.'
       }
     ]
   },
@@ -163,55 +145,55 @@ const DEFAULT_MODULE_DATABASE = [
     voltage: '3.3V',
     color: '#06b6d4',
     icon: 'fa-tv',
-    pins: ['VCC', 'GND', 'SCL', 'SDA'],
-    defaultEspPins: { 'VCC': '3V3', 'GND': 'GND', 'SCL': 'GPIO 22', 'SDA': 'GPIO 21' },
+    pins: ['GND', 'VCC', 'SCL', 'SDA'],
+    defaultEspPins: { 'VCC': '3V3', 'GND': 'GND', 'SCL': 'D22', 'SDA': 'D21' },
     wireColors: { 'VCC': '#ef4444', 'GND': '#0f172a', 'SCL': '#a855f7', 'SDA': '#3b82f6' },
-    desc: 'Tela gráfica monocromática 128x64 pixels comunicando via barramento I2C.',
+    desc: 'Tela gráfica monocromática 128x64 com comunicação I2C.',
     tutorialSteps: [
       {
         title: 'Posicionamento do Display',
         wireName: 'Encaixe na Protoboard',
         wireColor: '#06b6d4',
         sourcePin: 'Protoboard',
-        destPin: 'Área Superior',
-        wireType: 'Conector 4 Pinos',
-        explanation: 'Fixe o display OLED na protoboard deixando a tela visível para facilitar a leitura dos dados durante os testes.'
+        destPin: 'Área Visível',
+        wireType: 'Barra 4 Pinos',
+        explanation: 'Posicione o display OLED com a tela de vidro virada para cima para facilitar a leitura durante os testes.'
       },
       {
         title: 'Alimentação 3.3V (VCC)',
-        wireName: 'Fio Vermelho (VCC)',
+        wireName: 'Fio Vermelho (3.3V)',
         wireColor: '#ef4444',
-        sourcePin: 'ESP32: 3V3',
-        destPin: 'OLED: VCC',
+        sourcePin: 'ESP32: Pino 3V3',
+        destPin: 'OLED: Pino VCC',
         wireType: 'Macho-Macho',
-        explanation: 'Ligue o fio vermelho do pino 3V3 do ESP ao VCC do OLED. A tela funciona diretamente com a lógica de 3.3V.'
+        explanation: 'Conecte o fio vermelho do pino 3V3 do ESP ao VCC do OLED.'
       },
       {
         title: 'Aterramento (GND)',
         wireName: 'Fio Preto (GND)',
         wireColor: '#0f172a',
-        sourcePin: 'ESP32: GND',
-        destPin: 'OLED: GND',
+        sourcePin: 'ESP32: Pino GND',
+        destPin: 'OLED: Pino GND',
         wireType: 'Macho-Macho',
-        explanation: 'Ligue o fio preto do pino GND do ESP ao pino GND do display OLED.'
+        explanation: 'Conecte o fio preto do GND do ESP ao GND do OLED.'
       },
       {
-        title: 'Barramento I2C - Linha de Dados (SDA)',
-        wireName: 'Fio Azul (SDA)',
-        wireColor: '#3b82f6',
-        sourcePin: 'ESP32: GPIO 21',
-        destPin: 'OLED: SDA',
-        wireType: 'Macho-Macho',
-        explanation: 'O pino GPIO 21 é o canal de dados I2C nativo padrão do ESP32. Ele transfere os pixels da tela.'
-      },
-      {
-        title: 'Barramento I2C - Linha de Clock (SCL)',
+        title: 'I2C Clock de Comunicação (SCL)',
         wireName: 'Fio Roxo (SCL)',
         wireColor: '#a855f7',
-        sourcePin: 'ESP32: GPIO 22',
-        destPin: 'OLED: SCL',
+        sourcePin: 'ESP32: Pino D22',
+        destPin: 'OLED: Pino SCL',
         wireType: 'Macho-Macho',
-        explanation: 'O pino GPIO 22 é o canal de sincronismo de clock I2C do ESP32. Ele sincroniza o envio dos comandos à tela.'
+        explanation: 'O pino D22 é o SCL (Clock I2C nativo do ESP32). Ligue ao pino SCL do OLED.'
+      },
+      {
+        title: 'I2C Linha de Dados (SDA)',
+        wireName: 'Fio Azul (SDA)',
+        wireColor: '#3b82f6',
+        sourcePin: 'ESP32: Pino D21',
+        destPin: 'OLED: Pino SDA',
+        wireType: 'Macho-Macho',
+        explanation: 'O pino D21 é o SDA (Dados I2C nativo do ESP32). Ligue ao pino SDA do OLED.'
       }
     ]
   },
@@ -223,167 +205,76 @@ const DEFAULT_MODULE_DATABASE = [
     color: '#8b5cf6',
     icon: 'fa-arrows-left-right-to-line',
     pins: ['VCC', 'TRIG', 'ECHO', 'GND'],
-    defaultEspPins: { 'VCC': 'VIN (5V)', 'GND': 'GND', 'TRIG': 'GPIO 5', 'ECHO': 'GPIO 18' },
+    defaultEspPins: { 'VCC': 'VIN', 'GND': 'GND', 'TRIG': 'D5', 'ECHO': 'D18' },
     wireColors: { 'VCC': '#ef4444', 'GND': '#0f172a', 'TRIG': '#10b981', 'ECHO': '#f59e0b' },
-    desc: 'Mede distância de 2cm a 400cm via ondas sonoras de alta frequência.',
+    desc: 'Mede distância de 2cm a 400cm com emissão e recepção de ondas sonoras.',
     tutorialSteps: [
       {
-        title: 'Posicionamento dos Transdutores',
+        title: 'Posicionamento Frontal',
         wireName: 'Encaixe Frontal',
         wireColor: '#8b5cf6',
         sourcePin: 'Protoboard',
-        destPin: 'Borda Livre',
-        wireType: 'Encaixe 4 Pinos',
-        explanation: 'Posicione o sensor com os dois cilindros (olhos ultrassônicos) voltados para frente, livres de obstáculos a pelo menos 10cm.'
+        destPin: 'Área Livre',
+        wireType: '4 Pinos',
+        explanation: 'Deixe os dois cilindros de alumínio apontados para a frente sem barreiras próximas.'
       },
       {
         title: 'Alimentação 5V (VCC)',
         wireName: 'Fio Vermelho (5V)',
         wireColor: '#ef4444',
-        sourcePin: 'ESP32: VIN (5V)',
+        sourcePin: 'ESP32: Pino VIN (5V)',
         destPin: 'HC-SR04: VCC',
         wireType: 'Macho-Macho',
-        explanation: 'O emissor ultrassônico precisa de 5V estável para alcançar distância confiável. Conecte ao pino VIN do ESP32.'
+        explanation: 'Ligue o pino VIN do ESP32 ao VCC do HC-SR04.'
       },
       {
         title: 'Aterramento (GND)',
         wireName: 'Fio Preto (GND)',
         wireColor: '#0f172a',
-        sourcePin: 'ESP32: GND',
+        sourcePin: 'ESP32: Pino GND',
         destPin: 'HC-SR04: GND',
         wireType: 'Macho-Macho',
-        explanation: 'Conecte o fio preto do GND do ESP32 ao GND do sensor para fechar o terra.'
+        explanation: 'Ligue o pino GND do ESP32 ao GND do sensor.'
       },
       {
-        title: 'Gatilho de Disparo (TRIG)',
+        title: 'Disparo de Pulso (TRIG)',
         wireName: 'Fio Verde (TRIG)',
         wireColor: '#10b981',
-        sourcePin: 'ESP32: GPIO 5',
+        sourcePin: 'ESP32: Pino D5',
         destPin: 'HC-SR04: TRIG',
         wireType: 'Macho-Macho',
-        explanation: 'O pino GPIO 5 envia um pulso de 10 microssegundos para o sensor disparar o sinal sonoro de 40kHz.'
+        explanation: 'Ligue o pino D5 do ESP32 ao pino TRIG do sensor.'
       },
       {
         title: 'Retorno do Eco (ECHO)',
         wireName: 'Fio Laranja (ECHO)',
         wireColor: '#f59e0b',
-        sourcePin: 'ESP32: GPIO 18',
+        sourcePin: 'ESP32: Pino D18',
         destPin: 'HC-SR04: ECHO',
         wireType: 'Macho-Macho',
-        explanation: 'O pino ECHO envia de volta um pulso proporcional ao tempo de viagem do som. Conecte ao GPIO 18.'
-      }
-    ]
-  },
-  {
-    id: 'pir_motion',
-    name: 'Sensor de Presença PIR (HC-SR501)',
-    category: 'sensor',
-    voltage: '5V',
-    color: '#f97316',
-    icon: 'fa-person-walking',
-    pins: ['VCC', 'OUT', 'GND'],
-    defaultEspPins: { 'VCC': 'VIN (5V)', 'GND': 'GND', 'OUT': 'GPIO 19' },
-    wireColors: { 'VCC': '#ef4444', 'GND': '#0f172a', 'OUT': '#ec4899' },
-    desc: 'Detecta movimento e presença humana através da variação infravermelha.',
-    tutorialSteps: [
-      {
-        title: 'Posicionamento do Domo Fresnel',
-        wireName: 'Fixação da Lente',
-        wireColor: '#f97316',
-        sourcePin: 'Bancada',
-        destPin: 'Frente Aberta',
-        wireType: 'Macho-Fêmea',
-        explanation: 'Posicione a cúpula branca virada para a direção que deseja monitorar. Mantenha longe de fontes diretas de calor ou ventiladores.'
-      },
-      {
-        title: 'Alimentação 5V (VCC)',
-        wireName: 'Fio Vermelho (5V)',
-        wireColor: '#ef4444',
-        sourcePin: 'ESP32: VIN (5V)',
-        destPin: 'PIR: VCC',
-        wireType: 'Macho-Fêmea',
-        explanation: 'O sensor PIR possui um regulador interno que aceita 5V a 12V. Ligue ao pino VIN do seu ESP32.'
-      },
-      {
-        title: 'Aterramento (GND)',
-        wireName: 'Fio Preto (GND)',
-        wireColor: '#0f172a',
-        sourcePin: 'ESP32: GND',
-        destPin: 'PIR: GND',
-        wireType: 'Macho-Fêmea',
-        explanation: 'Ligue o fio preto do GND do ESP32 ao GND do sensor PIR.'
-      },
-      {
-        title: 'Saída Digital de Detecção (OUT)',
-        wireName: 'Fio Rosa (OUT)',
-        wireColor: '#ec4899',
-        sourcePin: 'ESP32: GPIO 19',
-        destPin: 'PIR: OUT',
-        wireType: 'Macho-Fêmea',
-        explanation: 'Quando alguém se movimentar, o pino OUT sobe para 3.3V (HIGH). Ligue ao pino GPIO 19 do ESP.'
-      }
-    ]
-  },
-  {
-    id: 'sg90_servo',
-    name: 'Micro Servo Motor (SG90 9g)',
-    category: 'atuador',
-    voltage: '5V',
-    color: '#eab308',
-    icon: 'fa-gear',
-    pins: ['VCC', 'GND', 'PWM'],
-    defaultEspPins: { 'VCC': 'VIN (5V)', 'GND': 'GND', 'PWM': 'GPIO 13' },
-    wireColors: { 'VCC': '#ef4444', 'GND': '#451a03', 'PWM': '#f97316' },
-    desc: 'Motor com rotação angular precisa de 0° a 180° com pulsos PWM.',
-    tutorialSteps: [
-      {
-        title: 'Fixação Mecânica do Servo',
-        wireName: 'Eixo Livre',
-        wireColor: '#eab308',
-        sourcePin: 'Bancada',
-        destPin: 'Espaço 180°',
-        wireType: 'Cabo 3 Vias',
-        explanation: 'Deixe o eixo de plástico e a cruzeta livres de obstáculos para que possa girar suavemente de 0 a 180 graus sem travar o motor.'
-      },
-      {
-        title: 'Alimentação do Motor (Fio Vermelho)',
-        wireName: 'Cabo Vermelho (5V)',
-        wireColor: '#ef4444',
-        sourcePin: 'ESP32: VIN (5V)',
-        destPin: 'Servo: Vermelho',
-        wireType: 'Macho-Fêmea',
-        explanation: 'Os motores consomem corrente significativa. Ligue o cabo vermelho do servo ao pino VIN (5V USB) para não sobrecarregar o regulador de 3.3V.'
-      },
-      {
-        title: 'Aterramento (Fio Marrom)',
-        wireName: 'Cabo Marrom (GND)',
-        wireColor: '#451a03',
-        sourcePin: 'ESP32: GND',
-        destPin: 'Servo: Marrom',
-        wireType: 'Macho-Fêmea',
-        explanation: 'No padrão de cores de servomotores, o cabo marrom é o GND. Conecte ao pino GND do ESP32.'
-      },
-      {
-        title: 'Sinal PWM de Posição (Fio Laranja)',
-        wireName: 'Cabo Laranja (PWM)',
-        wireColor: '#f97316',
-        sourcePin: 'ESP32: GPIO 13',
-        destPin: 'Servo: Laranja',
-        wireType: 'Macho-Fêmea',
-        explanation: 'Conecte o cabo laranja ao pino GPIO 13 do ESP32. Os pulsos de largura (1ms a 2ms) definirão o ângulo exato do motor.'
+        explanation: 'Ligue o pino D18 do ESP32 ao pino ECHO do sensor.'
       }
     ]
   }
 ];
 
-// --- App State ---
+// --- Persistent Application State ---
 let currentMcuId = 'esp32_wroom_30';
 let moduleDatabase = [];
-let attachedModules = []; // IDs of modules attached to the current build
+let attachedModules = [];
 let currentView = '3d';
 let showBreadboard = true;
 let showWires = true;
 let isAutoRotating = false;
+
+// Virtual simulation states
+let virtualPower = false;
+let virtualLedState = false;
+let virtualRelayState = false;
+let virtualDhtTemp = 24.5;
+let virtualDhtHum = 58;
+let userProjectNotes = '';
+let testHistoryLogs = [];
 
 // Tutorial Mode State
 let tutorialState = {
@@ -393,24 +284,21 @@ let tutorialState = {
   steps: []
 };
 
-// Virtual simulation states
-let virtualPower = false;
-let virtualLedState = false;
-let virtualRelayState = false;
-let virtualDhtTemp = 24.5;
-let virtualDhtHum = 58;
-
 // --- Three.js Globals ---
 let scene, camera, renderer, controls;
-let mcuMeshGroup, breadboardMeshGroup, modulesMeshGroup, wiresMeshGroup, tutorialHighlightGroup;
+let mcuMeshGroup, breadboardMeshGroup, modulesMeshGroup, wiresMeshGroup, tutorialHighlightGroup, pinLabelsGroup;
 let raycaster, mouse;
 let interactivePins = [];
 let oledCanvas, oledTexture;
-let cuttingMatTexture, espSilkscreenTexture, shieldLaserTexture;
+let cuttingMatTexture;
+
+// Coordinates cache for exact physical pins
+let espPhysicalPinCoords = {};
+let modulePhysicalPinCoords = {};
 
 // --- Initialization ---
 window.addEventListener('DOMContentLoaded', () => {
-  loadDatabase();
+  loadPersistentState();
   initThreeJs();
   renderCatalog();
   renderAttachedModules();
@@ -418,61 +306,179 @@ window.addEventListener('DOMContentLoaded', () => {
   generateFirmwareCode();
   renderDatabaseExplorer();
   updateVirtualControls();
+  renderHistoryLogs();
   window.addEventListener('resize', onWindowResize);
 });
 
-// Load database from localStorage or defaults
-function loadDatabase() {
-  const saved = localStorage.getItem('esp32_lab_custom_db_v2');
-  if (saved) {
-    try {
-      moduleDatabase = JSON.parse(saved);
-    } catch (e) {
-      moduleDatabase = [...DEFAULT_MODULE_DATABASE];
+// --- PERSISTENT MEMORY ENGINE (Saves Everything Automatically) ---
+function savePersistentState() {
+  const statePayload = {
+    version: '3.0',
+    timestamp: new Date().toISOString(),
+    currentMcuId,
+    attachedModules,
+    virtualPower,
+    virtualLedState,
+    virtualRelayState,
+    virtualDhtTemp,
+    virtualDhtHum,
+    userProjectNotes,
+    testHistoryLogs,
+    customDatabase: moduleDatabase
+  };
+
+  try {
+    localStorage.setItem('esp32_lab_state_v3', JSON.stringify(statePayload));
+    indicateSaveStatus(true);
+  } catch (e) {
+    console.error('Error saving state to localStorage', e);
+  }
+}
+
+function loadPersistentState() {
+  try {
+    const saved = localStorage.getItem('esp32_lab_state_v3');
+    if (saved) {
+      const data = JSON.parse(saved);
+      currentMcuId = data.currentMcuId || 'esp32_wroom_30';
+      attachedModules = data.attachedModules || ['rele_1ch'];
+      virtualPower = !!data.virtualPower;
+      virtualLedState = !!data.virtualLedState;
+      virtualRelayState = !!data.virtualRelayState;
+      virtualDhtTemp = data.virtualDhtTemp !== undefined ? data.virtualDhtTemp : 24.5;
+      virtualDhtHum = data.virtualDhtHum !== undefined ? data.virtualDhtHum : 58;
+      userProjectNotes = data.userProjectNotes || '';
+      testHistoryLogs = data.testHistoryLogs || [];
+      moduleDatabase = data.customDatabase || [...DEFAULT_MODULE_DATABASE];
+
+      const notesEl = document.getElementById('user-project-notes');
+      if (notesEl) notesEl.value = userProjectNotes;
+      const mcuSelect = document.getElementById('mcu-select');
+      if (mcuSelect) mcuSelect.value = currentMcuId;
+      return;
     }
-  } else {
-    moduleDatabase = [...DEFAULT_MODULE_DATABASE];
+  } catch (e) {
+    console.warn('Using default initial state');
   }
 
-  // Default start with Relay
+  // Fallback defaults
+  moduleDatabase = [...DEFAULT_MODULE_DATABASE];
   attachedModules = ['rele_1ch'];
+  testHistoryLogs = [
+    { timestamp: new Date().toLocaleTimeString(), text: 'Sessão iniciada com ESP32 DevKit V1 e Módulo Relé.' }
+  ];
 }
 
-function saveDatabase() {
-  localStorage.setItem('esp32_lab_custom_db_v2', JSON.stringify(moduleDatabase));
+function indicateSaveStatus(saved) {
+  const indicator = document.getElementById('save-indicator');
+  if (!indicator) return;
+  if (saved) {
+    indicator.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Memória Salva';
+    indicator.className = 'flex items-center gap-1 text-emerald-400 font-medium';
+  }
 }
 
-// --- Navigation / View Switching ---
+function logTestEvent(text) {
+  const entry = {
+    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+    text
+  };
+  testHistoryLogs.unshift(entry);
+  if (testHistoryLogs.length > 50) testHistoryLogs.pop();
+  renderHistoryLogs();
+  savePersistentState();
+}
+
+function renderHistoryLogs() {
+  const container = document.getElementById('history-log-list');
+  if (!container) return;
+
+  if (testHistoryLogs.length === 0) {
+    container.innerHTML = '<div class="text-slate-500 text-xs text-center py-6">Nenhum evento registrado ainda.</div>';
+    return;
+  }
+
+  container.innerHTML = testHistoryLogs.map(log => `
+    <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-xs">
+      <div class="flex items-center justify-between text-[10px] text-cyan-400 font-mono mb-1">
+        <span><i class="fa-solid fa-clock text-[9px] mr-1"></i> ${log.timestamp}</span>
+        <span class="text-slate-600">Evento</span>
+      </div>
+      <div class="text-slate-300 leading-relaxed">${log.text}</div>
+    </div>
+  `).join('');
+}
+
+function toggleHistoryDrawer() {
+  const drawer = document.getElementById('drawer-history');
+  drawer.classList.toggle('translate-x-full');
+}
+
+function clearHistoryLog() {
+  testHistoryLogs = [];
+  renderHistoryLogs();
+  savePersistentState();
+  showToast('Histórico de testes limpo.');
+}
+
+function saveUserNotes(val) {
+  userProjectNotes = val;
+  savePersistentState();
+}
+
+// --- UNIFIED MULTI-PANEL VIEW SWITCHER ---
 function switchView(viewName) {
   currentView = viewName;
-  const views = ['3d', 'wiring', 'test', 'db'];
-  views.forEach(v => {
-    const el = document.getElementById(`view-${v}`);
-    const btn = document.getElementById(`tab-btn-${v}`);
-    if (el) {
-      if (v === viewName) {
-        el.classList.remove('hidden');
-        if (btn) {
-          btn.className = "px-4 py-1.5 rounded-lg font-medium transition-all duration-200 bg-cyan-500 text-white shadow";
-        }
+  const panelArea = document.getElementById('panel-content-area');
+  const subviews = ['wiring', 'test', 'wokwi', 'db'];
+  const tabs = ['3d', 'wiring', 'test', 'wokwi', 'db'];
+
+  tabs.forEach(t => {
+    const btn = document.getElementById(`tab-btn-${t}`);
+    if (btn) {
+      if (t === viewName) {
+        btn.className = "px-3 py-1.5 rounded-lg font-medium transition-all duration-200 bg-cyan-500 text-white shadow";
       } else {
-        el.classList.add('hidden');
-        if (btn) {
-          btn.className = "px-4 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white transition-all duration-200";
-        }
+        btn.className = "px-3 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white transition-all duration-200";
       }
     }
   });
 
   if (viewName === '3d') {
-    onWindowResize();
-  } else if (viewName === 'wiring') {
-    updatePhysicalWiringGuide();
-  } else if (viewName === 'test') {
-    generateFirmwareCode();
-    updateVirtualControls();
-  } else if (viewName === 'db') {
-    renderDatabaseExplorer();
+    panelArea.classList.add('hidden');
+  } else {
+    panelArea.classList.remove('hidden');
+
+    subviews.forEach(s => {
+      const subEl = document.getElementById(`subview-${s}`);
+      if (subEl) {
+        if (s === viewName) {
+          subEl.classList.remove('hidden');
+        } else {
+          subEl.classList.add('hidden');
+        }
+      }
+    });
+
+    if (viewName === 'wiring') {
+      updatePhysicalWiringGuide();
+    } else if (viewName === 'test') {
+      generateFirmwareCode();
+      updateVirtualControls();
+    } else if (viewName === 'db') {
+      renderDatabaseExplorer();
+    }
+  }
+
+  savePersistentState();
+  setTimeout(() => onWindowResize(), 60);
+}
+
+function toggleSplitMode() {
+  if (currentView === '3d') {
+    switchView('wiring');
+  } else {
+    switchView('3d');
   }
 }
 
@@ -485,7 +491,9 @@ function onMcuChange(mcuId) {
   rebuild3dScene();
   updatePhysicalWiringGuide();
   generateFirmwareCode();
-  showToast(`Microcontrolador alterado para ${mcu.name}`);
+  logTestEvent(`Placa alterada para: ${mcu.name}`);
+  savePersistentState();
+  showToast(`Microcontrolador: ${mcu.name}`);
 }
 
 // --- Module Management ---
@@ -500,16 +508,24 @@ function attachModule(moduleId) {
   updatePhysicalWiringGuide();
   generateFirmwareCode();
   updateVirtualControls();
+  renderCatalog();
+  const mod = moduleDatabase.find(m => m.id === moduleId);
+  logTestEvent(`Módulo adicionado à bancada: ${mod ? mod.name : moduleId}`);
+  savePersistentState();
   showToast('Módulo adicionado à bancada!');
 }
 
 function detachModule(moduleId) {
+  const mod = moduleDatabase.find(m => m.id === moduleId);
   attachedModules = attachedModules.filter(id => id !== moduleId);
   renderAttachedModules();
   rebuild3dScene();
   updatePhysicalWiringGuide();
   generateFirmwareCode();
   updateVirtualControls();
+  renderCatalog();
+  logTestEvent(`Módulo removido da bancada: ${mod ? mod.name : moduleId}`);
+  savePersistentState();
   showToast('Módulo desconectado.');
 }
 
@@ -521,7 +537,10 @@ function clearAttachedModules() {
   updatePhysicalWiringGuide();
   generateFirmwareCode();
   updateVirtualControls();
-  showToast('Todos os módulos foram removidos da bancada.');
+  renderCatalog();
+  logTestEvent('Todos os módulos foram removidos da bancada.');
+  savePersistentState();
+  showToast('Todos os módulos foram removidos.');
 }
 
 function renderAttachedModules() {
@@ -531,7 +550,7 @@ function renderAttachedModules() {
 
   if (attachedModules.length === 0) {
     container.innerHTML = `
-      <div class="text-[11px] text-slate-500 text-center py-4 border border-dashed border-slate-800 rounded-xl">
+      <div class="text-[10px] text-slate-500 text-center py-3 border border-dashed border-slate-800 rounded-xl">
         Nenhum módulo na bancada.<br>Selecione um no catálogo abaixo.
       </div>
     `;
@@ -542,21 +561,21 @@ function renderAttachedModules() {
     const mod = moduleDatabase.find(m => m.id === modId);
     if (!mod) return '';
     return `
-      <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-cyan-500/40 transition">
-        <div class="flex items-center gap-2.5">
-          <div class="w-7 h-7 rounded-lg flex items-center justify-center text-xs text-white shadow" style="background-color: ${mod.color}">
+      <div class="flex items-center justify-between p-2 rounded-xl bg-slate-950 border border-slate-800 hover:border-cyan-500/40 transition">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded-lg flex items-center justify-center text-[10px] text-white shadow" style="background-color: ${mod.color}">
             <i class="fa-solid ${mod.icon}"></i>
           </div>
           <div>
-            <div class="text-xs font-semibold text-slate-200">${mod.name}</div>
-            <div class="text-[10px] text-cyan-400 font-mono">${mod.voltage} • ${mod.pins.length} pinos</div>
+            <div class="text-[11px] font-semibold text-slate-200">${mod.name}</div>
+            <div class="text-[9px] text-cyan-400 font-mono">${mod.voltage} • ${mod.pins.length} pinos</div>
           </div>
         </div>
         <div class="flex items-center gap-1">
-          <button onclick="startTeachingModule('${mod.id}')" class="px-2 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-lg text-[10px] font-bold flex items-center gap-1 transition" title="Me ensine a montar este módulo">
+          <button onclick="startTeachingModule('${mod.id}')" class="px-1.5 py-0.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded text-[9px] font-bold flex items-center gap-1 transition" title="Me ensine a montar este módulo">
             <i class="fa-solid fa-graduation-cap"></i> Ensinar
           </button>
-          <button onclick="detachModule('${mod.id}')" class="text-slate-500 hover:text-rose-400 p-1.5 text-xs transition" title="Remover">
+          <button onclick="detachModule('${mod.id}')" class="text-slate-500 hover:text-rose-400 p-1 text-[11px] transition" title="Remover">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -576,15 +595,15 @@ function renderCatalog(filterText = '') {
   container.innerHTML = filtered.map(mod => {
     const isAttached = attachedModules.includes(mod.id);
     return `
-      <div class="p-3 rounded-xl border ${isAttached ? 'border-cyan-500/60 bg-cyan-950/20' : 'border-slate-800 bg-slate-950 hover:border-slate-700'} transition flex flex-col gap-2 group">
+      <div class="p-2.5 rounded-xl border ${isAttached ? 'border-cyan-500/60 bg-cyan-950/20' : 'border-slate-800 bg-slate-950 hover:border-slate-700'} transition flex flex-col gap-1.5 group">
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm text-white shadow" style="background-color: ${mod.color}">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg flex items-center justify-center text-xs text-white shadow" style="background-color: ${mod.color}">
               <i class="fa-solid ${mod.icon}"></i>
             </div>
             <div>
-              <div class="text-xs font-semibold text-slate-200 group-hover:text-cyan-400 transition">${mod.name}</div>
-              <div class="text-[10px] text-slate-400 flex items-center gap-1.5">
+              <div class="text-[11px] font-semibold text-slate-200 group-hover:text-cyan-400 transition">${mod.name}</div>
+              <div class="text-[9px] text-slate-400 flex items-center gap-1">
                 <span class="capitalize">${mod.category}</span>
                 <span>•</span>
                 <span class="text-amber-400 font-mono">${mod.voltage}</span>
@@ -593,16 +612,15 @@ function renderCatalog(filterText = '') {
           </div>
 
           <button onclick="${isAttached ? `detachModule('${mod.id}')` : `attachModule('${mod.id}')`}" 
-                  class="px-2.5 py-1 rounded-lg text-[11px] font-semibold transition ${isAttached ? 'bg-cyan-950 text-cyan-400 border border-cyan-800 hover:bg-rose-950 hover:text-rose-300 hover:border-rose-800' : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700'}">
-            ${isAttached ? '<i class="fa-solid fa-check mr-1"></i> Na Bancada' : '<i class="fa-solid fa-plus mr-1"></i> Adicionar'}
+                  class="px-2 py-0.5 rounded text-[10px] font-semibold transition ${isAttached ? 'bg-cyan-950 text-cyan-400 border border-cyan-800 hover:bg-rose-950 hover:text-rose-300' : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700'}">
+            ${isAttached ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-plus"></i>'}
           </button>
         </div>
 
-        <!-- Teach Me Button -->
-        <div class="pt-1.5 border-t border-slate-900/80 flex items-center justify-between">
-          <span class="text-[10px] text-slate-500">${mod.pins.length} conexões</span>
-          <button onclick="startTeachingModule('${mod.id}')" class="text-[11px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 bg-amber-950/40 border border-amber-800/60 px-2.5 py-0.5 rounded-lg transition shadow-sm">
-            <i class="fa-solid fa-graduation-cap text-xs"></i> Me Ensine Onde Colocar
+        <div class="pt-1 border-t border-slate-900 flex items-center justify-between">
+          <span class="text-[9px] text-slate-500">${mod.pins.length} conexões</span>
+          <button onclick="startTeachingModule('${mod.id}')" class="text-[10px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 bg-amber-950/40 border border-amber-800/60 px-2 py-0.5 rounded transition shadow-sm">
+            <i class="fa-solid fa-graduation-cap text-[10px]"></i> Me Ensine Onde Colocar
           </button>
         </div>
       </div>
@@ -615,34 +633,40 @@ function filterCatalog() {
   renderCatalog(query);
 }
 
-// --- INTERACTIVE TEACHING / STEP-BY-STEP TUTORIAL ENGINE ---
+function startQuickTutorial() {
+  if (attachedModules.length > 0) {
+    startTeachingModule(attachedModules[0]);
+  } else {
+    attachModule('rele_1ch');
+    startTeachingModule('rele_1ch');
+  }
+}
+
+// --- INTERACTIVE STEP-BY-STEP TEACHING ENGINE ---
 function startTeachingModule(moduleId) {
   const mod = moduleDatabase.find(m => m.id === moduleId);
   if (!mod) return;
 
-  // Make sure module is attached so we can see it
   if (!attachedModules.includes(moduleId)) {
     attachedModules.push(moduleId);
     renderAttachedModules();
     renderCatalog();
   }
 
-  // Switch to 3D View
-  switchView('3d');
-
   tutorialState.active = true;
   tutorialState.moduleId = moduleId;
   tutorialState.currentStep = 0;
   tutorialState.steps = mod.tutorialSteps || generateDefaultTutorialSteps(mod);
 
-  // Show Tutorial HUD
   const hud = document.getElementById('tutorial-hud');
   hud.classList.remove('hidden');
 
   renderCurrentTutorialStep();
   rebuild3dScene();
   focusCameraOnStep();
-  showToast(`Iniciando tutorial passo a passo: ${mod.name}`);
+  logTestEvent(`Tutorial de montagem iniciado para: ${mod.name}`);
+  savePersistentState();
+  showToast(`Tutorial ativado: ${mod.name}`);
 }
 
 function generateDefaultTutorialSteps(mod) {
@@ -707,7 +731,7 @@ function renderCurrentTutorialStep() {
   document.getElementById('tut-module-sub').textContent = step.title;
 
   const wireBadge = document.getElementById('tut-wire-badge');
-  wireBadge.innerHTML = `<span class="w-2.5 h-2.5 rounded-full inline-block" style="background-color: ${step.wireColor}"></span> ${step.wireName}`;
+  wireBadge.innerHTML = `<span class="w-2 h-2 rounded-full inline-block" style="background-color: ${step.wireColor}"></span> ${step.wireName}`;
   wireBadge.style.borderColor = step.wireColor;
 
   document.getElementById('tut-source-pin').textContent = step.sourcePin;
@@ -715,13 +739,11 @@ function renderCurrentTutorialStep() {
   document.getElementById('tut-explanation').textContent = step.explanation;
   document.getElementById('tut-wire-kind').textContent = step.wireType;
 
-  // Dots
   const dotsContainer = document.getElementById('tut-dots-container');
   dotsContainer.innerHTML = tutorialState.steps.map((_, i) => {
-    return `<span class="w-2.5 h-2.5 rounded-full transition-all ${i === tutorialState.currentStep ? 'bg-amber-400 w-5' : (i < tutorialState.currentStep ? 'bg-emerald-500' : 'bg-slate-700')}"></span>`;
+    return `<span class="w-2 h-2 rounded-full transition-all ${i === tutorialState.currentStep ? 'bg-amber-400 w-4' : (i < tutorialState.currentStep ? 'bg-emerald-500' : 'bg-slate-700')}"></span>`;
   }).join('');
 
-  // Buttons state
   const prevBtn = document.getElementById('tut-btn-prev');
   const nextBtn = document.getElementById('tut-btn-next');
 
@@ -732,11 +754,11 @@ function renderCurrentTutorialStep() {
   }
 
   if (tutorialState.currentStep === tutorialState.steps.length - 1) {
-    nextBtn.innerHTML = '<span>Concluir Montagem!</span> <i class="fa-solid fa-check"></i>';
-    nextBtn.className = 'px-4 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-emerald-500/20 transition';
+    nextBtn.innerHTML = '<span>Concluir!</span> <i class="fa-solid fa-check"></i>';
+    nextBtn.className = 'px-3 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-emerald-500/20 transition';
   } else {
-    nextBtn.innerHTML = '<span>Próximo Passo</span> <i class="fa-solid fa-chevron-right"></i>';
-    nextBtn.className = 'px-4 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-amber-500/20 transition';
+    nextBtn.innerHTML = '<span>Próximo</span> <i class="fa-solid fa-chevron-right text-[10px]"></i>';
+    nextBtn.className = 'px-3.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-amber-500/20 transition';
   }
 }
 
@@ -746,8 +768,10 @@ function tutorialNextStep() {
     renderCurrentTutorialStep();
     rebuild3dScene();
     focusCameraOnStep();
+    logTestEvent(`Avançou tutorial: Passo ${tutorialState.currentStep + 1}`);
   } else {
     showToast('Parabéns! Você concluiu toda a montagem física deste módulo!');
+    logTestEvent(`Tutorial concluído com sucesso para: ${tutorialState.moduleId}`);
     closeTutorialMode();
   }
 }
@@ -769,91 +793,159 @@ function closeTutorialMode() {
 }
 
 function focusCameraOnStep() {
-  // Smoothly adjust camera to highlight the active module and pins
   if (tutorialState.currentStep === 0) {
-    // Overview of module placement
     camera.position.set(2, 14, 18);
   } else {
-    // Zoom in on connections
     camera.position.set(0, 11, 15);
   }
   controls.target.set(0, 1.5, 0);
   controls.update();
 }
 
-// --- TEXTURE GENERATORS FOR ULTRA-REALISM ---
+// --- EXACT PHYSICAL 1:1 PIN COORDINATE RESOLVER ---
+// Maps every pin name of the ESP32 and Modules to its exact 3D vector
+function getEspPhysicalPinCoord(pinName) {
+  const mcu = MCUS[currentMcuId];
+  const pinsPerRow = Math.floor(mcu.pinsCount / 2);
+  const pinSpacing = 6.8 / (pinsPerRow - 1);
+  const xStart = -6.7;
 
-// Realistic Cutting Mat (Bancada de Laboratório Maker)
+  // Clean pin name (e.g. 'GPIO 23', 'D23' -> 'D23')
+  let clean = pinName.replace('GPIO', 'D').replace(' ', '').trim();
+  if (clean === '23') clean = 'D23';
+  if (clean === '22') clean = 'D22';
+  if (clean === '21') clean = 'D21';
+  if (clean === '19') clean = 'D19';
+  if (clean === '18') clean = 'D18';
+  if (clean === '5') clean = 'D5';
+  if (clean === '4') clean = 'D4';
+  if (clean === '2') clean = 'D2';
+  if (clean === '15') clean = 'D15';
+  if (clean === '13') clean = 'D13';
+  if (clean === '14') clean = 'D14';
+  if (clean === '25') clean = 'D25';
+  if (clean === '26') clean = 'D26';
+  if (clean === '27') clean = 'D27';
+  if (clean === '32') clean = 'D32';
+  if (clean === '33') clean = 'D33';
+  if (clean === '34') clean = 'D34';
+  if (clean === '35') clean = 'D35';
+
+  // Check left row (Z = -1.65)
+  for (let i = 0; i < mcu.leftPins.length; i++) {
+    const p = mcu.leftPins[i];
+    if (p === clean || (p.startsWith('VIN') && clean.includes('VIN')) || (p.startsWith('3V3') && clean.includes('3V3')) || (p === 'GND' && clean.includes('GND'))) {
+      const x = xStart + (i * pinSpacing);
+      return new THREE.Vector3(x, 2.32, -1.65);
+    }
+  }
+
+  // Check right row (Z = +1.65)
+  for (let i = 0; i < mcu.rightPins.length; i++) {
+    const p = mcu.rightPins[i];
+    if (p === clean || (p.startsWith('3V3') && clean.includes('3V3')) || (p === 'GND' && clean.includes('GND'))) {
+      const x = xStart + (i * pinSpacing);
+      return new THREE.Vector3(x, 2.32, 1.65);
+    }
+  }
+
+  // Default fallback
+  return new THREE.Vector3(-3.5, 2.32, 1.65);
+}
+
+// Module Pin Coordinates Resolver
+function getModulePhysicalPinCoord(modId, modPin, modXOffset) {
+  if (modId === 'rele_1ch') {
+    // Relay pins: VCC, GND, IN at x = modXOffset - 1.3
+    if (modPin === 'VCC') return new THREE.Vector3(modXOffset - 1.3, 2.25, -0.6);
+    if (modPin === 'GND') return new THREE.Vector3(modXOffset - 1.3, 2.25, 0.0);
+    if (modPin === 'IN') return new THREE.Vector3(modXOffset - 1.3, 2.25, 0.6);
+  } else if (modId === 'dht22') {
+    // DHT22 pins
+    if (modPin === 'VCC') return new THREE.Vector3(modXOffset - 0.6, 2.0, 0.0);
+    if (modPin === 'DATA') return new THREE.Vector3(modXOffset - 0.2, 2.0, 0.0);
+    if (modPin === 'GND') return new THREE.Vector3(modXOffset + 0.6, 2.0, 0.0);
+  } else if (modId === 'oled_i2c') {
+    // OLED pins: GND, VCC, SCL, SDA at z = -1.15
+    if (modPin === 'GND') return new THREE.Vector3(modXOffset - 0.75, 2.2, -1.15);
+    if (modPin === 'VCC') return new THREE.Vector3(modXOffset - 0.25, 2.2, -1.15);
+    if (modPin === 'SCL') return new THREE.Vector3(modXOffset + 0.25, 2.2, -1.15);
+    if (modPin === 'SDA') return new THREE.Vector3(modXOffset + 0.75, 2.2, -1.15);
+  } else if (modId === 'hc_sr04') {
+    if (modPin === 'VCC') return new THREE.Vector3(modXOffset - 0.75, 2.2, -0.9);
+    if (modPin === 'TRIG') return new THREE.Vector3(modXOffset - 0.25, 2.2, -0.9);
+    if (modPin === 'ECHO') return new THREE.Vector3(modXOffset + 0.25, 2.2, -0.9);
+    if (modPin === 'GND') return new THREE.Vector3(modXOffset + 0.75, 2.2, -0.9);
+  }
+
+  // Fallback for custom modules
+  return new THREE.Vector3(modXOffset - 0.8, 2.2, -0.5);
+}
+
+// Floating 3D Text Pin Billboard Sprites
+function createPinTextSprite(text, colorHex) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 128;
+  canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = '#0f172a';
+  ctx.strokeStyle = colorHex || '#06b6d4';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.roundRect(4, 4, 120, 56, 12);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 24px monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, 64, 32);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
+  const sprite = new THREE.Sprite(spriteMat);
+  sprite.scale.set(1.4, 0.7, 1);
+  return sprite;
+}
+
+// --- TEXTURE GENERATORS ---
 function generateCuttingMatTexture() {
   const canvas = document.createElement('canvas');
   canvas.width = 1024;
   canvas.height = 1024;
   const ctx = canvas.getContext('2d');
 
-  // Dark ESD Anti-static mat green/slate
   ctx.fillStyle = '#0a1d1c';
   ctx.fillRect(0, 0, 1024, 1024);
 
-  // Border frame
   ctx.strokeStyle = '#14b8a6';
   ctx.lineWidth = 4;
   ctx.strokeRect(20, 20, 984, 984);
 
-  // 10mm and 50mm Grid lines
   ctx.strokeStyle = 'rgba(20, 184, 166, 0.15)';
   ctx.lineWidth = 1;
   for (let x = 40; x < 1000; x += 20) {
-    ctx.beginPath();
-    ctx.moveTo(x, 20);
-    ctx.lineTo(x, 1004);
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x, 20); ctx.lineTo(x, 1004); ctx.stroke();
   }
   for (let y = 40; y < 1000; y += 20) {
-    ctx.beginPath();
-    ctx.moveTo(20, y);
-    ctx.lineTo(1004, y);
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(20, y); ctx.lineTo(1004, y); ctx.stroke();
   }
 
-  // Major 50mm lines
   ctx.strokeStyle = 'rgba(20, 184, 166, 0.4)';
   ctx.lineWidth = 2;
   for (let x = 40; x < 1000; x += 100) {
-    ctx.beginPath();
-    ctx.moveTo(x, 20);
-    ctx.lineTo(x, 1004);
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x, 20); ctx.lineTo(x, 1004); ctx.stroke();
   }
   for (let y = 40; y < 1000; y += 100) {
-    ctx.beginPath();
-    ctx.moveTo(20, y);
-    ctx.lineTo(1004, y);
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(20, y); ctx.lineTo(1004, y); ctx.stroke();
   }
 
-  // Angle guide lines (30°, 45°, 60°)
-  ctx.strokeStyle = 'rgba(20, 184, 166, 0.25)';
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(512, 512);
-  ctx.lineTo(950, 950); // 45 deg
-  ctx.moveTo(512, 512);
-  ctx.lineTo(75, 950);
-  ctx.stroke();
-
-  // Degree circles
-  ctx.beginPath();
-  ctx.arc(512, 512, 180, 0, Math.PI * 2);
-  ctx.arc(512, 512, 320, 0, Math.PI * 2);
-  ctx.stroke();
-
-  // Silkscreen text on mat
   ctx.fillStyle = 'rgba(20, 184, 166, 0.7)';
   ctx.font = 'bold 16px monospace';
   ctx.fillText('ELECTRONICS WORKBENCH - ESD SAFE', 50, 60);
-  ctx.fillText('10mm GRID / METRIC SCALE', 720, 60);
-  ctx.font = '12px monospace';
-  ctx.fillText('ESP32 3D LAB & STUDIO v2.0', 50, 980);
+  ctx.fillText('ESP32 3D LAB v3.0 • FIO A PINO 1:1', 50, 980);
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.wrapS = THREE.RepeatWrapping;
@@ -861,29 +953,15 @@ function generateCuttingMatTexture() {
   return texture;
 }
 
-// Ultra-Detailed ESP32 PCB Silkscreen Texture
 function generateEsp32SilkscreenTexture(mcu) {
   const canvas = document.createElement('canvas');
   canvas.width = 1024;
   canvas.height = 512;
   const ctx = canvas.getContext('2d');
 
-  // Matte Black PCB background
   ctx.fillStyle = '#0b0f19';
   ctx.fillRect(0, 0, 1024, 512);
 
-  // Subtle copper trace texture
-  ctx.strokeStyle = 'rgba(217, 119, 6, 0.15)';
-  ctx.lineWidth = 2;
-  for (let i = 0; i < 20; i++) {
-    ctx.beginPath();
-    ctx.moveTo(100 + i * 40, 100);
-    ctx.lineTo(150 + i * 40, 200);
-    ctx.lineTo(250 + i * 40, 200);
-    ctx.stroke();
-  }
-
-  // Serpentine PCB Antenna in Gold
   ctx.strokeStyle = '#d4af37';
   ctx.lineWidth = 6;
   ctx.beginPath();
@@ -893,12 +971,10 @@ function generateEsp32SilkscreenTexture(mcu) {
   }
   ctx.stroke();
 
-  // White Silkscreen Border
   ctx.strokeStyle = '#ffffff';
   ctx.lineWidth = 2.5;
   ctx.strokeRect(30, 30, 964, 452);
 
-  // Pin Labels (Left / Top Row)
   ctx.fillStyle = '#ffffff';
   ctx.font = 'bold 17px monospace';
   ctx.textAlign = 'center';
@@ -910,7 +986,6 @@ function generateEsp32SilkscreenTexture(mcu) {
   leftPins.forEach((pinName, i) => {
     const x = xStart + (i * xSpacing);
     ctx.fillText(pinName, x, 75);
-    // Draw golden pad circle around pin through-hole
     ctx.strokeStyle = '#d4af37';
     ctx.lineWidth = 3;
     ctx.beginPath();
@@ -918,12 +993,10 @@ function generateEsp32SilkscreenTexture(mcu) {
     ctx.stroke();
   });
 
-  // Pin Labels (Right / Bottom Row)
   const rightPins = mcu.rightPins;
   rightPins.forEach((pinName, i) => {
     const x = xStart + (i * xSpacing);
     ctx.fillText(pinName, x, 445);
-    // Draw golden pad circle around pin through-hole
     ctx.strokeStyle = '#d4af37';
     ctx.lineWidth = 3;
     ctx.beginPath();
@@ -931,55 +1004,44 @@ function generateEsp32SilkscreenTexture(mcu) {
     ctx.stroke();
   });
 
-  // Center ESP32 Logo
   ctx.fillStyle = '#ffffff';
   ctx.font = 'bold 24px monospace';
   ctx.fillText('ESP32 DEVKIT V1', 450, 230);
   ctx.font = '14px monospace';
   ctx.fillStyle = '#94a3b8';
-  ctx.fillText('NodeMCU-32S • 2.4GHz Wi-Fi + BLE', 450, 260);
+  ctx.fillText('NodeMCU-32S • Fiação 1:1 Fiel', 450, 260);
 
   return new THREE.CanvasTexture(canvas);
 }
 
-// ESP-WROOM-32 Metallic Laser Engraving Texture
 function generateShieldLaserTexture() {
   const canvas = document.createElement('canvas');
   canvas.width = 512;
   canvas.height = 512;
   const ctx = canvas.getContext('2d');
 
-  // Brushed aluminum metallic grey
   ctx.fillStyle = '#cbd5e1';
   ctx.fillRect(0, 0, 512, 512);
 
-  // Laser engraved dark grey text
   ctx.fillStyle = '#334155';
   ctx.textAlign = 'center';
 
-  // Espressif Logo Text
   ctx.font = 'bold 36px sans-serif';
   ctx.fillText('ESPRESSIF', 256, 120);
-
   ctx.font = 'bold 44px sans-serif';
   ctx.fillText('ESP-WROOM-32', 256, 180);
-
   ctx.font = '18px monospace';
   ctx.fillText('FCC ID: 2AC7Z-ESPWROOM32', 256, 240);
   ctx.fillText('CE 1313 • Wi-Fi & Bluetooth', 256, 275);
-  ctx.fillText('Espressif Systems (Shanghai)', 256, 310);
 
-  // QR Code / Data Matrix silhouette placeholder
   ctx.fillStyle = '#1e293b';
   ctx.fillRect(216, 340, 80, 80);
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(226, 350, 20, 20);
-  ctx.fillRect(256, 380, 20, 20);
 
   return new THREE.CanvasTexture(canvas);
 }
 
-// Dynamic OLED Screen Texture
 function setupOledDynamicTexture() {
   oledCanvas = document.createElement('canvas');
   oledCanvas.width = 256;
@@ -989,10 +1051,10 @@ function setupOledDynamicTexture() {
   ctx.fillRect(0, 0, 256, 128);
   ctx.fillStyle = '#06b6d4';
   ctx.font = 'bold 16px Courier New, monospace';
-  ctx.fillText('ESP32 3D LAB', 15, 35);
+  ctx.fillText('ESP32 3D LAB v3', 15, 35);
   ctx.font = '12px Courier New, monospace';
-  ctx.fillText('WiFi: Conectado', 15, 60);
-  ctx.fillText('IP: 192.168.1.104', 15, 80);
+  ctx.fillText('Memória: ATIVA', 15, 60);
+  ctx.fillText('Fiação: 1:1 Fiel', 15, 80);
   ctx.fillText('Status: ONLINE', 15, 105);
 
   oledTexture = new THREE.CanvasTexture(oledCanvas);
@@ -1021,16 +1083,13 @@ function initThreeJs() {
   const width = container.clientWidth || window.innerWidth;
   const height = container.clientHeight || window.innerHeight;
 
-  // Scene
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x020617); // Dark Slate 950
+  scene.background = new THREE.Color(0x020617);
   scene.fog = new THREE.FogExp2(0x020617, 0.02);
 
-  // Camera
   camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 1000);
   camera.position.set(0, 16, 22);
 
-  // Renderer with ACESFilmicToneMapping for Photorealistic Colors
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
   renderer.setSize(width, height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -1040,71 +1099,50 @@ function initThreeJs() {
   renderer.toneMappingExposure = 1.35;
   container.appendChild(renderer.domElement);
 
-  // Controls
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.06;
-  controls.maxPolarAngle = Math.PI / 2.05; // Prevent camera under floor
+  controls.maxPolarAngle = Math.PI / 2.05;
   controls.minDistance = 4;
   controls.maxDistance = 55;
 
-  // Studio Lighting
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.95);
   scene.add(ambientLight);
 
-  // Main Desk Key Light
   const mainLight = new THREE.DirectionalLight(0xffffff, 1.4);
   mainLight.position.set(12, 28, 16);
   mainLight.castShadow = true;
   mainLight.shadow.mapSize.width = 2048;
   mainLight.shadow.mapSize.height = 2048;
-  mainLight.shadow.camera.near = 0.5;
-  mainLight.shadow.camera.far = 70;
   mainLight.shadow.bias = -0.0005;
   scene.add(mainLight);
 
-  // Soft Warm Lamp Fill Light
   const warmLamp = new THREE.DirectionalLight(0xfef08a, 0.5);
   warmLamp.position.set(-15, 18, -10);
   scene.add(warmLamp);
 
-  // Cyan & Amber Accent Glows for Maker Atmosphere
   const cyanGlow = new THREE.PointLight(0x06b6d4, 1.8, 35);
   cyanGlow.position.set(-10, 8, 8);
   scene.add(cyanGlow);
 
-  const amberGlow = new THREE.PointLight(0xf59e0b, 1.4, 35);
-  amberGlow.position.set(12, 8, -6);
-  scene.add(amberGlow);
-
-  // Create High-Res Textures
   cuttingMatTexture = generateCuttingMatTexture();
   setupOledDynamicTexture();
 
-  // Create Realistic Workbench Cutting Mat
   const matGeo = new THREE.PlaneGeometry(55, 45);
-  const matMaterial = new THREE.MeshStandardMaterial({
-    map: cuttingMatTexture,
-    roughness: 0.7,
-    metalness: 0.05
-  });
+  const matMaterial = new THREE.MeshStandardMaterial({ map: cuttingMatTexture, roughness: 0.7, metalness: 0.05 });
   const cuttingMat = new THREE.Mesh(matGeo, matMaterial);
   cuttingMat.rotation.x = -Math.PI / 2;
   cuttingMat.position.y = -0.02;
   cuttingMat.receiveShadow = true;
   scene.add(cuttingMat);
 
-  // Raycaster & Mouse
   raycaster = new THREE.Raycaster();
   mouse = new THREE.Vector2();
 
   container.addEventListener('mousemove', onMouseMove);
   container.addEventListener('click', onMouseClick);
 
-  // Build Scene
   rebuild3dScene();
-
-  // Animation Loop
   animate();
 }
 
@@ -1114,6 +1152,7 @@ function rebuild3dScene() {
   if (modulesMeshGroup) scene.remove(modulesMeshGroup);
   if (wiresMeshGroup) scene.remove(wiresMeshGroup);
   if (tutorialHighlightGroup) scene.remove(tutorialHighlightGroup);
+  if (pinLabelsGroup) scene.remove(pinLabelsGroup);
 
   interactivePins = [];
 
@@ -1122,24 +1161,19 @@ function rebuild3dScene() {
   modulesMeshGroup = new THREE.Group();
   wiresMeshGroup = new THREE.Group();
   tutorialHighlightGroup = new THREE.Group();
+  pinLabelsGroup = new THREE.Group();
 
-  // 1. Build Breadboard
   if (showBreadboard) {
     createBreadboard3D(breadboardMeshGroup);
   }
 
-  // 2. Build Selected MCU (ESP32)
   createMcu3D(mcuMeshGroup, currentMcuId);
-
-  // 3. Build Attached Modules
   createAttachedModules3D(modulesMeshGroup);
 
-  // 4. Build 3D Jumpers / Wires
   if (showWires) {
-    createWires3D(wiresMeshGroup);
+    createWires3D(wiresMeshGroup, pinLabelsGroup);
   }
 
-  // 5. If Tutorial Mode is Active, add pulsing pin highlights
   if (tutorialState.active) {
     createTutorialHighlights(tutorialHighlightGroup);
   }
@@ -1149,40 +1183,32 @@ function rebuild3dScene() {
   scene.add(modulesMeshGroup);
   scene.add(wiresMeshGroup);
   scene.add(tutorialHighlightGroup);
+  scene.add(pinLabelsGroup);
 }
 
-// Procedural Realistic Breadboard Model
 function createBreadboard3D(group) {
   const bbWidth = 24;
   const bbHeight = 1.3;
   const bbDepth = 8.5;
 
-  // Breadboard body (off-white ABS plastic)
   const bodyGeo = new THREE.BoxGeometry(bbWidth, bbHeight, bbDepth);
-  const bodyMat = new THREE.MeshStandardMaterial({
-    color: 0xf8fafc,
-    roughness: 0.55,
-    metalness: 0.05
-  });
+  const bodyMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.55, metalness: 0.05 });
   const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
   bodyMesh.position.set(0, bbHeight / 2, 0);
   bodyMesh.receiveShadow = true;
   bodyMesh.castShadow = true;
   group.add(bodyMesh);
 
-  // Center trough (notch separating rows)
   const notchGeo = new THREE.BoxGeometry(bbWidth - 0.6, 0.45, 0.9);
   const notchMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.8 });
   const notchMesh = new THREE.Mesh(notchGeo, notchMat);
   notchMesh.position.set(0, bbHeight, 0);
   group.add(notchMesh);
 
-  // Power rails (red & blue stripes)
   const lineGeo = new THREE.BoxGeometry(bbWidth - 1, 0.02, 0.15);
   const redMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
   const blueMat = new THREE.MeshBasicMaterial({ color: 0x3b82f6 });
 
-  // Top rails (+) and (-)
   const topRed = new THREE.Mesh(lineGeo, redMat);
   topRed.position.set(0, bbHeight + 0.01, 3.6);
   group.add(topRed);
@@ -1190,7 +1216,6 @@ function createBreadboard3D(group) {
   topBlue.position.set(0, bbHeight + 0.01, 3.2);
   group.add(topBlue);
 
-  // Bottom rails (+) and (-)
   const botBlue = new THREE.Mesh(lineGeo, blueMat);
   botBlue.position.set(0, bbHeight + 0.01, -3.2);
   group.add(botBlue);
@@ -1199,86 +1224,32 @@ function createBreadboard3D(group) {
   group.add(botRed);
 }
 
-// Procedural Ultra-Realistic ESP32 NodeMCU 3D Model
 function createMcu3D(group, mcuId) {
   const mcu = MCUS[mcuId];
   const pcbLength = 8.0;
   const pcbWidth = 3.8;
   const pcbThickness = 0.24;
 
-  // PCB Board Texture
   const pcbTexture = generateEsp32SilkscreenTexture(mcu);
-  const pcbMat = new THREE.MeshStandardMaterial({
-    map: pcbTexture,
-    roughness: 0.35,
-    metalness: 0.2
-  });
-
-  const pcbGeo = new THREE.BoxGeometry(pcbLength, pcbThickness, pcbWidth);
-  const pcbMesh = new THREE.Mesh(pcbGeo, pcbMat);
+  const pcbMat = new THREE.MeshStandardMaterial({ map: pcbTexture, roughness: 0.35, metalness: 0.2 });
+  const pcbMesh = new THREE.Mesh(new THREE.BoxGeometry(pcbLength, pcbThickness, pcbWidth), pcbMat);
   pcbMesh.position.set(-3.5, 1.9, 0);
   pcbMesh.castShadow = true;
   pcbMesh.receiveShadow = true;
   group.add(pcbMesh);
 
-  // Metal Shield (ESP-WROOM-32) with Laser Engraved Details
   const shieldTex = generateShieldLaserTexture();
   const shieldGeo = new THREE.BoxGeometry(2.8, 0.42, 2.5);
-  const shieldMat = new THREE.MeshStandardMaterial({
-    map: shieldTex,
-    metalness: 0.92,
-    roughness: 0.22
-  });
+  const shieldMat = new THREE.MeshStandardMaterial({ map: shieldTex, metalness: 0.92, roughness: 0.22 });
   const shieldMesh = new THREE.Mesh(shieldGeo, shieldMat);
   shieldMesh.position.set(-2.8, 2.15, 0);
   shieldMesh.castShadow = true;
   group.add(shieldMesh);
 
-  // Micro USB Connector (Silver Sheet Metal)
-  const usbGeo = new THREE.BoxGeometry(1.0, 0.45, 1.1);
-  const usbMat = new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.95, roughness: 0.1 });
-  const usbMesh = new THREE.Mesh(usbGeo, usbMat);
+  const usbMesh = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.45, 1.1), new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.95, roughness: 0.1 }));
   usbMesh.position.set(-7.1, 2.05, 0);
   group.add(usbMesh);
 
-  // USB Inner Plastic Tongue
-  const usbTongue = new THREE.Mesh(
-    new THREE.BoxGeometry(0.5, 0.15, 0.6),
-    new THREE.MeshStandardMaterial({ color: 0x0f172a })
-  );
-  usbTongue.position.set(-7.3, 2.05, 0);
-  group.add(usbTongue);
-
-  // AMS1117 3.3V Voltage Regulator Chip (SOT-223)
-  const regBody = new THREE.Mesh(
-    new THREE.BoxGeometry(0.8, 0.3, 0.5),
-    new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.3 })
-  );
-  regBody.position.set(-4.5, 2.1, -1.0);
-  group.add(regBody);
-
-  // CP2102 USB-to-UART Bridge Controller (QFN square chip)
-  const cp2102 = new THREE.Mesh(
-    new THREE.BoxGeometry(0.7, 0.2, 0.7),
-    new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.25 })
-  );
-  cp2102.position.set(-5.5, 2.05, 0);
-  group.add(cp2102);
-
-  // Tactile Micro Push Buttons (EN and BOOT)
-  const btnHousingMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.4 });
-  const btnMetalMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.9, roughness: 0.15 });
-
-  [-1.2, 1.2].forEach(zPos => {
-    const btnBase = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.25, 0.45), btnHousingMat);
-    btnBase.position.set(-6.3, 2.1, zPos);
-    group.add(btnBase);
-    const btnCap = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.15, 12), btnMetalMat);
-    btnCap.position.set(-6.3, 2.25, zPos);
-    group.add(btnCap);
-  });
-
-  // Power LED (Red)
   const pwrLedMat = new THREE.MeshStandardMaterial({
     color: virtualPower ? 0xef4444 : 0x450a0a,
     emissive: virtualPower ? 0xef4444 : 0x000000,
@@ -1288,7 +1259,6 @@ function createMcu3D(group, mcuId) {
   pwrLed.position.set(-5.3, 2.1, -1.0);
   group.add(pwrLed);
 
-  // GPIO 2 Onboard LED (Blue)
   const gpio2LedMat = new THREE.MeshStandardMaterial({
     color: (virtualPower && virtualLedState) ? 0x06b6d4 : 0x082f49,
     emissive: (virtualPower && virtualLedState) ? 0x06b6d4 : 0x000000,
@@ -1298,7 +1268,7 @@ function createMcu3D(group, mcuId) {
   gpio2Led.position.set(-5.3, 2.1, 1.0);
   group.add(gpio2Led);
 
-  // Golden Pin Headers with Black DuPont Collar Bases
+  // Pin Headers at EXACT physical positions
   const pinsPerRow = Math.floor(mcu.pinsCount / 2);
   const pinSpacing = 6.8 / (pinsPerRow - 1);
   const pinGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.85, 8);
@@ -1306,113 +1276,66 @@ function createMcu3D(group, mcuId) {
   const collarGeo = new THREE.BoxGeometry(0.3, 0.4, 0.3);
   const collarMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.6 });
 
-  // Left pin row
   for (let i = 0; i < pinsPerRow; i++) {
     const xPos = -6.7 + (i * pinSpacing);
     const zPos = -1.65;
-
-    // Collar
     const collar = new THREE.Mesh(collarGeo, collarMat);
     collar.position.set(xPos, 1.7, zPos);
     group.add(collar);
-
-    // Pin
     const pin = new THREE.Mesh(pinGeo, pinMat.clone());
     pin.position.set(xPos, 1.9, zPos);
-    pin.userData = {
-      isPin: true,
-      mcuPin: true,
-      name: mcu.leftPins[i] || `PIN_L${i}`,
-      side: 'left',
-      index: i
-    };
+    pin.userData = { isPin: true, mcuPin: true, name: mcu.leftPins[i], side: 'left', index: i };
     group.add(pin);
     interactivePins.push(pin);
   }
 
-  // Right pin row
   for (let i = 0; i < pinsPerRow; i++) {
     const xPos = -6.7 + (i * pinSpacing);
     const zPos = 1.65;
-
-    // Collar
     const collar = new THREE.Mesh(collarGeo, collarMat);
     collar.position.set(xPos, 1.7, zPos);
     group.add(collar);
-
-    // Pin
     const pin = new THREE.Mesh(pinGeo, pinMat.clone());
     pin.position.set(xPos, 1.9, zPos);
-    pin.userData = {
-      isPin: true,
-      mcuPin: true,
-      name: mcu.rightPins[i] || `PIN_R${i}`,
-      side: 'right',
-      index: i
-    };
+    pin.userData = { isPin: true, mcuPin: true, name: mcu.rightPins[i], side: 'right', index: i };
     group.add(pin);
     interactivePins.push(pin);
   }
 }
 
-// Procedural Attached Modules
 function createAttachedModules3D(group) {
-  let offsetX = 3.8;
-
+  let offsetX = 4.2;
   attachedModules.forEach((modId) => {
     const modGroup = new THREE.Group();
     modGroup.position.set(offsetX, 1.8, 0);
 
-    if (modId === 'rele_1ch') {
-      createRelay3D(modGroup);
-    } else if (modId === 'dht22') {
-      createDht223D(modGroup);
-    } else if (modId === 'oled_i2c') {
-      createOled3D(modGroup);
-    } else if (modId === 'hc_sr04') {
-      createUltrasonic3D(modGroup);
-    } else if (modId === 'pir_motion') {
-      createPir3D(modGroup);
-    } else if (modId === 'sg90_servo') {
-      createServo3D(modGroup);
-    } else {
-      createGenericModule3D(modGroup, modId);
-    }
+    if (modId === 'rele_1ch') createRelay3D(modGroup);
+    else if (modId === 'dht22') createDht223D(modGroup);
+    else if (modId === 'oled_i2c') createOled3D(modGroup);
+    else if (modId === 'hc_sr04') createUltrasonic3D(modGroup);
+    else createGenericModule3D(modGroup, modId);
 
     group.add(modGroup);
-    offsetX += 4.8;
+    offsetX += 5.0;
   });
 }
 
 function createRelay3D(group) {
-  // PCB Blue Base
-  const pcb = new THREE.Mesh(
-    new THREE.BoxGeometry(3.4, 0.22, 2.8),
-    new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.4 })
-  );
+  const pcb = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.22, 2.8), new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.4 }));
   pcb.position.y = 0.11;
   pcb.castShadow = true;
   group.add(pcb);
 
-  // Relay Blue Cube (Songle SRD)
-  const cubeMat = new THREE.MeshStandardMaterial({
-    color: virtualRelayState ? 0x2563eb : 0x1e40af,
-    roughness: 0.35
-  });
+  const cubeMat = new THREE.MeshStandardMaterial({ color: virtualRelayState ? 0x2563eb : 0x1e40af, roughness: 0.35 });
   const cube = new THREE.Mesh(new THREE.BoxGeometry(1.9, 1.6, 1.9), cubeMat);
   cube.position.set(-0.4, 0.95, 0);
   cube.castShadow = true;
   group.add(cube);
 
-  // Terminal block (green screw terminals)
-  const term = new THREE.Mesh(
-    new THREE.BoxGeometry(0.9, 1.0, 2.3),
-    new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.5 })
-  );
+  const term = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.0, 2.3), new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.5 }));
   term.position.set(1.2, 0.65, 0);
   group.add(term);
 
-  // Relay Status LED
   const rLedMat = new THREE.MeshStandardMaterial({
     color: virtualRelayState ? 0x22c55e : 0x052e16,
     emissive: virtualRelayState ? 0x22c55e : 0x000000,
@@ -1422,13 +1345,9 @@ function createRelay3D(group) {
   rLed.position.set(-0.8, 0.32, -1.0);
   group.add(rLed);
 
-  // Header Pins with DuPont base
   const pins = ['VCC', 'GND', 'IN'];
   pins.forEach((pName, i) => {
-    const pin = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.08, 0.08, 0.65, 8),
-      new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.95 })
-    );
+    const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.65, 8), new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.95 }));
     pin.position.set(-1.3, 0.45, -0.6 + (i * 0.6));
     pin.userData = { isPin: true, modulePin: true, module: 'rele_1ch', name: pName };
     group.add(pin);
@@ -1437,7 +1356,6 @@ function createRelay3D(group) {
 }
 
 function createDht223D(group) {
-  // White slotted housing
   const caseGeo = new THREE.BoxGeometry(2.1, 2.5, 1.5);
   const caseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.45 });
   const caseMesh = new THREE.Mesh(caseGeo, caseMat);
@@ -1445,13 +1363,9 @@ function createDht223D(group) {
   caseMesh.castShadow = true;
   group.add(caseMesh);
 
-  // Pins
   const pins = ['VCC', 'DATA', 'NC', 'GND'];
   pins.forEach((pName, i) => {
-    const pin = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.06, 0.06, 0.7, 8),
-      new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.9 })
-    );
+    const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.7, 8), new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.9 }));
     pin.position.set(-0.6 + (i * 0.4), 0.2, 0);
     pin.userData = { isPin: true, modulePin: true, module: 'dht22', name: pName };
     group.add(pin);
@@ -1460,29 +1374,20 @@ function createDht223D(group) {
 }
 
 function createOled3D(group) {
-  // PCB Blue Base
-  const pcb = new THREE.Mesh(
-    new THREE.BoxGeometry(2.9, 0.22, 2.9),
-    new THREE.MeshStandardMaterial({ color: 0x1e3a8a, roughness: 0.35 })
-  );
+  const pcb = new THREE.Mesh(new THREE.BoxGeometry(2.9, 0.22, 2.9), new THREE.MeshStandardMaterial({ color: 0x1e3a8a, roughness: 0.35 }));
   pcb.position.y = 0.11;
   pcb.castShadow = true;
   group.add(pcb);
 
-  // Glass Screen with Dynamic Canvas Texture
   const screenGeo = new THREE.BoxGeometry(2.5, 0.1, 1.9);
   const screenMat = new THREE.MeshBasicMaterial({ map: oledTexture });
   const screen = new THREE.Mesh(screenGeo, screenMat);
   screen.position.set(0, 0.28, 0.3);
   group.add(screen);
 
-  // 4 Pins on top (GND, VCC, SCL, SDA)
   const pins = ['GND', 'VCC', 'SCL', 'SDA'];
   pins.forEach((pName, i) => {
-    const pin = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.06, 0.06, 0.6, 8),
-      new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.95 })
-    );
+    const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.6, 8), new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.95 }));
     pin.position.set(-0.75 + (i * 0.5), 0.4, -1.15);
     pin.userData = { isPin: true, modulePin: true, module: 'oled_i2c', name: pName };
     group.add(pin);
@@ -1491,16 +1396,11 @@ function createOled3D(group) {
 }
 
 function createUltrasonic3D(group) {
-  // PCB Blue Base
-  const pcb = new THREE.Mesh(
-    new THREE.BoxGeometry(4.2, 0.22, 2.4),
-    new THREE.MeshStandardMaterial({ color: 0x1d4ed8 })
-  );
+  const pcb = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.22, 2.4), new THREE.MeshStandardMaterial({ color: 0x1d4ed8 }));
   pcb.position.y = 0.11;
   pcb.castShadow = true;
   group.add(pcb);
 
-  // Two metallic cylinders (Transducer T and R)
   const cylGeo = new THREE.CylinderGeometry(0.75, 0.75, 1.3, 20);
   const cylMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.95, roughness: 0.1 });
 
@@ -1516,76 +1416,11 @@ function createUltrasonic3D(group) {
   cyl2.castShadow = true;
   group.add(cyl2);
 
-  // Pins
   const pins = ['VCC', 'TRIG', 'ECHO', 'GND'];
   pins.forEach((pName, i) => {
-    const pin = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.06, 0.06, 0.6, 8),
-      new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.95 })
-    );
+    const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.6, 8), new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.95 }));
     pin.position.set(-0.75 + (i * 0.5), 0.4, -0.9);
     pin.userData = { isPin: true, modulePin: true, module: 'hc_sr04', name: pName };
-    group.add(pin);
-    interactivePins.push(pin);
-  });
-}
-
-function createPir3D(group) {
-  // PCB Green Base
-  const pcb = new THREE.Mesh(
-    new THREE.BoxGeometry(3.2, 0.22, 2.5),
-    new THREE.MeshStandardMaterial({ color: 0x15803d })
-  );
-  pcb.position.y = 0.11;
-  group.add(pcb);
-
-  // Fresnel white hemisphere dome
-  const domeGeo = new THREE.SphereGeometry(1.05, 18, 18, 0, Math.PI * 2, 0, Math.PI / 2);
-  const domeMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.7, opacity: 0.95, transparent: true });
-  const dome = new THREE.Mesh(domeGeo, domeMat);
-  dome.position.set(0, 0.25, 0);
-  dome.castShadow = true;
-  group.add(dome);
-
-  // Pins
-  const pins = ['VCC', 'OUT', 'GND'];
-  pins.forEach((pName, i) => {
-    const pin = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.06, 0.06, 0.6, 8),
-      new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.95 })
-    );
-    pin.position.set(-0.6 + (i * 0.6), 0.4, 1.05);
-    pin.userData = { isPin: true, modulePin: true, module: 'pir_motion', name: pName };
-    group.add(pin);
-    interactivePins.push(pin);
-  });
-}
-
-function createServo3D(group) {
-  // Translucent blue plastic casing
-  const bodyGeo = new THREE.BoxGeometry(2.3, 2.2, 1.2);
-  const bodyMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, transparent: true, opacity: 0.9, roughness: 0.3 });
-  const body = new THREE.Mesh(bodyGeo, bodyMat);
-  body.position.set(0, 1.1, 0);
-  body.castShadow = true;
-  group.add(body);
-
-  // White horn / arm
-  const hornGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.3, 16);
-  const hornMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
-  const horn = new THREE.Mesh(hornGeo, hornMat);
-  horn.position.set(0.6, 2.3, 0);
-  group.add(horn);
-
-  // Pins
-  const pins = ['VCC', 'GND', 'PWM'];
-  pins.forEach((pName, i) => {
-    const pin = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.06, 0.06, 0.5, 8),
-      new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.8 })
-    );
-    pin.position.set(-0.8, 0.3, -0.4 + (i * 0.4));
-    pin.userData = { isPin: true, modulePin: true, module: 'sg90_servo', name: pName };
     group.add(pin);
     interactivePins.push(pin);
   });
@@ -1594,146 +1429,109 @@ function createServo3D(group) {
 function createGenericModule3D(group, modId) {
   const mod = moduleDatabase.find(m => m.id === modId);
   const colorHex = mod ? parseInt(mod.color.replace('#', '0x')) : 0x06b6d4;
-
-  const pcb = new THREE.Mesh(
-    new THREE.BoxGeometry(2.7, 0.22, 2.7),
-    new THREE.MeshStandardMaterial({ color: colorHex })
-  );
+  const pcb = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.22, 2.7), new THREE.MeshStandardMaterial({ color: colorHex }));
   pcb.position.y = 0.11;
   pcb.castShadow = true;
   group.add(pcb);
-
-  const ic = new THREE.Mesh(
-    new THREE.BoxGeometry(1.1, 0.3, 1.1),
-    new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.3 })
-  );
-  ic.position.set(0, 0.26, 0);
-  group.add(ic);
-
-  if (mod && mod.pins) {
-    mod.pins.forEach((pName, i) => {
-      const pin = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.06, 0.06, 0.6, 8),
-        new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.95 })
-      );
-      pin.position.set(-0.8 + (i * 0.5), 0.4, -1.05);
-      pin.userData = { isPin: true, modulePin: true, module: modId, name: pName };
-      group.add(pin);
-      interactivePins.push(pin);
-    });
-  }
 }
 
-// 3D Realistic Curved Jumpers with DuPont Terminals
-function createWires3D(group) {
+// 1:1 PHYSICAL WIRES ENGINE WITH 3D PIN LABELS
+function createWires3D(wireGroup, labelGroup) {
   if (attachedModules.length === 0) return;
 
-  let modXOffset = 3.8;
+  let modXOffset = 4.2;
 
   attachedModules.forEach(modId => {
     const mod = moduleDatabase.find(m => m.id === modId);
     if (!mod || !mod.defaultEspPins) {
-      modXOffset += 4.8;
+      modXOffset += 5.0;
       return;
     }
 
-    // In tutorial mode, only show wires up to the current active step!
     let maxWireIndex = 999;
     if (tutorialState.active && tutorialState.moduleId === modId) {
-      maxWireIndex = tutorialState.currentStep - 1; // Step 0 is placement
+      maxWireIndex = tutorialState.currentStep - 1;
     }
 
     Object.entries(mod.defaultEspPins).forEach(([modPin, espPin], pinIndex) => {
       if (tutorialState.active && tutorialState.moduleId === modId && pinIndex > maxWireIndex) {
-        return; // Don't show wire yet!
+        return;
       }
 
-      // Start & End positions
-      const startX = -3.5 + (pinIndex * 0.45);
-      const startY = 2.2;
-      const startZ = espPin.includes('VIN') || espPin.includes('3V3') || espPin.includes('GND') ? 1.65 : -1.65;
+      // Exact Physical Coordinates for Start & End
+      const pStart = getEspPhysicalPinCoord(espPin);
+      const pEnd = getModulePhysicalPinCoord(modId, modPin, modXOffset);
 
-      const endX = modXOffset - 1.2 + (pinIndex * 0.55);
-      const endY = 2.1;
-      const endZ = 0.0;
-
-      // Realistic DuPont Terminals (Black plastic sleeves at both ends)
+      // DuPont Sleeves
       const dupontGeo = new THREE.BoxGeometry(0.24, 0.55, 0.24);
       const dupontMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.5 });
 
       const d1 = new THREE.Mesh(dupontGeo, dupontMat);
-      d1.position.set(startX, startY + 0.1, startZ);
-      group.add(d1);
+      d1.position.set(pStart.x, pStart.y + 0.1, pStart.z);
+      wireGroup.add(d1);
 
       const d2 = new THREE.Mesh(dupontGeo, dupontMat);
-      d2.position.set(endX, endY + 0.1, endZ);
-      group.add(d2);
+      d2.position.set(pEnd.x, pEnd.y + 0.1, pEnd.z);
+      wireGroup.add(d2);
 
-      // Catenary sag / Bézier curve for flexible insulated wire
-      const midX = (startX + endX) / 2;
-      const midY = Math.max(startY, endY) + 2.8 + (pinIndex * 0.45);
-      const midZ = (startZ + endZ) / 2 + 1.2;
+      // Catenary sag / Bézier curve between exact pins
+      const midX = (pStart.x + pEnd.x) / 2;
+      const archHeight = Math.max(pStart.y, pEnd.y) + 2.4 + (pinIndex * 0.4);
+      const midZ = (pStart.z + pEnd.z) / 2 + 1.0;
 
       const curve = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(startX, startY + 0.4, startZ),
-        new THREE.Vector3(startX, startY + 1.1, startZ),
-        new THREE.Vector3(midX, midY, midZ),
-        new THREE.Vector3(endX, endY + 1.1, endZ),
-        new THREE.Vector3(endX, endY + 0.4, endZ)
+        new THREE.Vector3(pStart.x, pStart.y + 0.35, pStart.z),
+        new THREE.Vector3(pStart.x, pStart.y + 1.0, pStart.z),
+        new THREE.Vector3(midX, archHeight, midZ),
+        new THREE.Vector3(pEnd.x, pEnd.y + 1.0, pEnd.z),
+        new THREE.Vector3(pEnd.x, pEnd.y + 0.35, pEnd.z)
       ]);
 
       const tubeGeo = new THREE.TubeGeometry(curve, 36, 0.08, 10, false);
       const wireColorHex = mod.wireColors && mod.wireColors[modPin] ? parseInt(mod.wireColors[modPin].replace('#', '0x')) : 0xeab308;
-      const tubeMat = new THREE.MeshStandardMaterial({
-        color: wireColorHex,
-        roughness: 0.25,
-        metalness: 0.08
-      });
-
+      const tubeMat = new THREE.MeshStandardMaterial({ color: wireColorHex, roughness: 0.25, metalness: 0.08 });
       const wireMesh = new THREE.Mesh(tubeGeo, tubeMat);
       wireMesh.castShadow = true;
-      group.add(wireMesh);
+      wireGroup.add(wireMesh);
+
+      // Floating 3D Billboards right above the pins
+      const espLabel = createPinTextSprite(espPin, (mod.wireColors && mod.wireColors[modPin]) || '#06b6d4');
+      espLabel.position.set(pStart.x, pStart.y + 1.2, pStart.z);
+      labelGroup.add(espLabel);
+
+      const modLabel = createPinTextSprite(modPin, (mod.wireColors && mod.wireColors[modPin]) || '#06b6d4');
+      modLabel.position.set(pEnd.x, pEnd.y + 1.1, pEnd.z);
+      labelGroup.add(modLabel);
     });
 
-    modXOffset += 4.8;
+    modXOffset += 5.0;
   });
 }
 
-// Visual Glowing Holographic Highlights during Tutorial Steps
 function createTutorialHighlights(group) {
   if (!tutorialState.active) return;
   const step = tutorialState.steps[tutorialState.currentStep];
   if (!step) return;
 
   if (tutorialState.currentStep === 0) {
-    // Step 0: Highlight placement zone with an amber pulsating ring
     const ringGeo = new THREE.RingGeometry(1.6, 2.0, 32);
-    const ringMat = new THREE.MeshBasicMaterial({
-      color: 0xf59e0b,
-      side: THREE.DoubleSide,
-      transparent: true,
-      opacity: 0.8
-    });
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b, side: THREE.DoubleSide, transparent: true, opacity: 0.8 });
     const ring = new THREE.Mesh(ringGeo, ringMat);
     ring.rotation.x = -Math.PI / 2;
-    ring.position.set(3.8, 1.85, 0);
+    ring.position.set(4.2, 1.85, 0);
     group.add(ring);
   } else {
-    // Highlight active source and destination pins with glowing spheres
-    const highlightGeo = new THREE.SphereGeometry(0.3, 16, 16);
-    const highlightMat = new THREE.MeshBasicMaterial({
-      color: 0xf59e0b,
-      wireframe: true
-    });
+    const highlightGeo = new THREE.SphereGeometry(0.35, 16, 16);
+    const highlightMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b, wireframe: true });
 
-    // ESP Pin
     const p1 = new THREE.Mesh(highlightGeo, highlightMat);
-    p1.position.set(-3.5, 2.8, step.destPin.includes('VCC') || step.destPin.includes('5V') || step.destPin.includes('GND') ? 1.65 : -1.65);
+    const espCoord = getEspPhysicalPinCoord(step.sourcePin);
+    p1.position.copy(espCoord);
     group.add(p1);
 
-    // Module Pin
     const p2 = new THREE.Mesh(highlightGeo, highlightMat);
-    p2.position.set(2.8, 2.8, 0);
+    const modCoord = getModulePhysicalPinCoord(tutorialState.moduleId, step.destPin.replace('Relé: ', '').replace('DHT22: ', '').replace('OLED: ', '').replace('HC-SR04: ', ''), 4.2);
+    p2.position.copy(modCoord);
     group.add(p2);
   }
 }
@@ -1747,7 +1545,6 @@ function onMouseMove(event) {
 
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObjects(interactivePins);
-
   const hoverCard = document.getElementById('pin-hover-card');
 
   if (intersects.length > 0) {
@@ -1758,7 +1555,7 @@ function onMouseMove(event) {
 
     const pinData = pin.userData;
     document.getElementById('hover-pin-name').textContent = pinData.name;
-    document.getElementById('hover-pin-type').textContent = pinData.mcuPin ? 'Pino MCU' : 'Pino Módulo';
+    document.getElementById('hover-pin-type').textContent = pinData.mcuPin ? 'Pino Fiel MCU' : 'Pino Módulo';
     document.getElementById('hover-pin-desc').textContent = getPinDescription(pinData.name);
     document.getElementById('hover-pin-volt').textContent = pinData.name.includes('VIN') || pinData.name.includes('5V') ? '5.0V Máx' : '3.3V Máx (Atenção)';
     document.getElementById('hover-pin-status').textContent = 'Pronto para conexão';
@@ -1794,15 +1591,15 @@ function updateInspectorForPin(pinName) {
   const inspectorBody = document.getElementById('inspector-body');
   const desc = getPinDescription(pinName);
   inspectorBody.innerHTML = `
-    <div class="p-3.5 bg-cyan-950/30 border border-cyan-500/40 rounded-xl space-y-2">
-      <div class="text-xs font-bold text-cyan-300 flex items-center justify-between">
+    <div class="p-2.5 bg-cyan-950/30 border border-cyan-500/40 rounded-xl space-y-1.5">
+      <div class="text-[11px] font-bold text-cyan-300 flex items-center justify-between">
         <span>${pinName}</span>
-        <span class="text-[10px] text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">Inspecionado</span>
+        <span class="text-[9px] text-emerald-400 bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-800">Inspecionado</span>
       </div>
-      <p class="text-slate-300 text-[11px] leading-relaxed">${desc}</p>
-      <div class="text-[10px] text-slate-400 pt-1.5 border-t border-slate-800 flex items-center justify-between">
+      <p class="text-slate-300 text-[10px] leading-relaxed">${desc}</p>
+      <div class="text-[9px] text-slate-400 pt-1 border-t border-slate-800 flex items-center justify-between">
         <span>Tensão Segura:</span>
-        <span class="text-white font-bold">${pinName.includes('5V') || pinName.includes('VIN') ? '5.0V' : '3.3V (Não use 5V)'}</span>
+        <span class="text-white font-bold">${pinName.includes('5V') || pinName.includes('VIN') ? '5.0V' : '3.3V'}</span>
       </div>
     </div>
   `;
@@ -1845,6 +1642,7 @@ function onWindowResize() {
   if (!container || !camera || !renderer) return;
   const width = container.clientWidth;
   const height = container.clientHeight;
+  if (width === 0 || height === 0) return;
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
   renderer.setSize(width, height);
@@ -1878,27 +1676,20 @@ function updatePhysicalWiringGuide() {
       const wireHex = (mod.wireColors && mod.wireColors[modPin]) || '#eab308';
       let wireName = getWireColorName(wireHex);
 
-      let signalType = 'Digital GPIO';
-      if (modPin.includes('VCC') || modPin.includes('5V') || modPin.includes('3V3')) signalType = 'Alimentação (+)';
-      else if (modPin.includes('GND')) signalType = 'Terra / Ground (-)';
-      else if (modPin.includes('SCL') || modPin.includes('SDA')) signalType = 'Barramento I2C';
-      else if (modPin.includes('PWM')) signalType = 'Controle PWM';
-
       rowsHtml += `
-        <tr class="hover:bg-slate-900/60 transition">
-          <td class="py-3 px-3">
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[11px] font-bold border border-slate-700" style="background-color: ${wireHex}25; color: ${wireHex === '#0f172a' ? '#94a3b8' : wireHex}">
-              <span class="w-2.5 h-2.5 rounded-full inline-block" style="background-color: ${wireHex}"></span>
+        <tr class="hover:bg-slate-900/60 transition cursor-pointer" onclick="highlightWireFromTable('${mod.id}', '${modPin}')">
+          <td class="py-2.5 px-3">
+            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold border border-slate-700" style="background-color: ${wireHex}25; color: ${wireHex === '#0f172a' ? '#94a3b8' : wireHex}">
+              <span class="w-2 h-2 rounded-full inline-block" style="background-color: ${wireHex}"></span>
               ${wireName}
             </span>
           </td>
-          <td class="py-3 px-3 font-semibold text-slate-200">${mod.name}</td>
-          <td class="py-3 px-3 text-amber-300 font-bold">${modPin}</td>
-          <td class="py-3 px-3 text-emerald-400 font-bold">${espPin}</td>
-          <td class="py-3 px-3 text-slate-400">${signalType}</td>
-          <td class="py-3 px-3 text-right">
-            <button onclick="startTeachingModule('${mod.id}')" class="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-slate-950 rounded-lg text-[10px] font-bold border border-amber-500/40 transition">
-              <i class="fa-solid fa-graduation-cap"></i> Ensinar
+          <td class="py-2.5 px-3 font-semibold text-slate-200">${mod.name}</td>
+          <td class="py-2.5 px-3 text-amber-300 font-bold">${modPin}</td>
+          <td class="py-2.5 px-3 text-emerald-400 font-bold">${espPin}</td>
+          <td class="py-2.5 px-3 text-right">
+            <button onclick="event.stopPropagation(); startTeachingModule('${mod.id}')" class="px-2 py-0.5 bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-slate-950 rounded text-[9px] font-bold border border-amber-500/40 transition">
+              <i class="fa-solid fa-graduation-cap"></i> Ensinar no 3D
             </button>
           </td>
         </tr>
@@ -1907,6 +1698,11 @@ function updatePhysicalWiringGuide() {
   });
 
   tbody.innerHTML = rowsHtml;
+}
+
+function highlightWireFromTable(modId, pinName) {
+  startTeachingModule(modId);
+  showToast(`Destacando fio do pino ${pinName} no modelo 3D ao lado!`);
 }
 
 function printWiringGuide() {
@@ -1921,19 +1717,22 @@ function toggleVirtualPower() {
 
   if (virtualPower) {
     btn.textContent = 'DESLIGAR';
-    btn.className = 'px-3.5 py-1 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-bold transition';
+    btn.className = 'px-3 py-1 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-bold transition';
     badge.textContent = 'LIGADO (5V USB)';
-    badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 animate-pulse font-semibold';
+    badge.className = 'text-[9px] px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 animate-pulse font-semibold';
+    logTestEvent('Alimentação USB 5V ligada.');
   } else {
     btn.textContent = 'LIGAR';
-    btn.className = 'px-3.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold transition';
+    btn.className = 'px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold transition';
     badge.textContent = 'Desligado';
-    badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700';
+    badge.className = 'text-[9px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700';
+    logTestEvent('Alimentação USB desligada.');
   }
 
   rebuild3dScene();
   updateVirtualControls();
-  showToast(virtualPower ? 'ESP32 Alimentado! LEDs ativos na placa.' : 'Alimentação desligada.');
+  savePersistentState();
+  showToast(virtualPower ? 'ESP32 Alimentado! LEDs ativos.' : 'Alimentação desligada.');
 }
 
 function toggleOnboardLed() {
@@ -1943,15 +1742,15 @@ function toggleOnboardLed() {
   }
   virtualLedState = !virtualLedState;
   const statusEl = document.getElementById('virtual-led-status');
-  const textEl = document.getElementById('virtual-led-text');
   if (virtualLedState) {
     statusEl.className = 'w-2.5 h-2.5 rounded-full bg-cyan-400 shadow shadow-cyan-400 inline-block';
-    textEl.textContent = 'ACESO (HIGH)';
+    logTestEvent('LED Azul Onboard (GPIO 2) ACESO (HIGH).');
   } else {
     statusEl.className = 'w-2.5 h-2.5 rounded-full bg-slate-700 inline-block';
-    textEl.textContent = 'Apagado (LOW)';
+    logTestEvent('LED Azul Onboard (GPIO 2) APAGADO (LOW).');
   }
   rebuild3dScene();
+  savePersistentState();
 }
 
 function toggleVirtualRelay() {
@@ -1963,15 +1762,20 @@ function toggleVirtualRelay() {
   updateOledTextureText(virtualDhtTemp, virtualDhtHum);
   rebuild3dScene();
   updateVirtualControls();
-  showToast(virtualRelayState ? 'Relé ATIVADO (Click mecânico - Contato Fechado)' : 'Relé DESATIVADO (Contato Aberto)');
+  logTestEvent(virtualRelayState ? 'Relé ATIVADO (Bobina energizada, contato NO fechado).' : 'Relé DESATIVADO.');
+  savePersistentState();
+  showToast(virtualRelayState ? 'Relé ATIVADO (Veja a cor mudar no modelo 3D!)' : 'Relé DESATIVADO (Contato Aberto)');
 }
 
 function updateVirtualDht(tempVal, humVal) {
   virtualDhtTemp = parseFloat(tempVal);
   virtualDhtHum = parseInt(humVal);
-  document.getElementById('lbl-virtual-temp').textContent = `${virtualDhtTemp.toFixed(1)} °C`;
-  document.getElementById('lbl-virtual-hum').textContent = `${virtualDhtHum} %`;
+  const tEl = document.getElementById('lbl-virtual-temp');
+  const hEl = document.getElementById('lbl-virtual-hum');
+  if (tEl) tEl.textContent = `${virtualDhtTemp.toFixed(1)} °C`;
+  if (hEl) hEl.textContent = `${virtualDhtHum} %`;
   updateOledTextureText(virtualDhtTemp, virtualDhtHum);
+  savePersistentState();
 }
 
 function updateVirtualControls() {
@@ -1982,15 +1786,15 @@ function updateVirtualControls() {
 
   if (attachedModules.includes('rele_1ch')) {
     html += `
-      <div class="bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
+      <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
         <div class="flex items-center justify-between mb-1.5">
-          <span class="text-xs font-semibold text-slate-300">Módulo Relé (GPIO 23)</span>
+          <span class="text-xs font-semibold text-slate-300">Módulo Relé (Pino D23)</span>
           <button onclick="toggleVirtualRelay()" class="px-2.5 py-1 ${virtualRelayState ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300'} rounded-lg text-xs font-bold transition">
             ${virtualRelayState ? 'DESATIVAR' : 'ATIVAR'}
           </button>
         </div>
-        <div class="text-[11px] text-slate-400">
-          Status: <span class="${virtualRelayState ? 'text-blue-400 font-bold' : 'text-slate-500'}">${virtualRelayState ? 'ATIVADO (NO Fechado)' : 'DESLIGADO (COM Aberto)'}</span>
+        <div class="text-[10px] text-slate-400">
+          Status no 3D: <span class="${virtualRelayState ? 'text-blue-400 font-bold' : 'text-slate-500'}">${virtualRelayState ? 'ATIVADO (Cubo azul aceso)' : 'DESLIGADO (Em repouso)'}</span>
         </div>
       </div>
     `;
@@ -1998,17 +1802,17 @@ function updateVirtualControls() {
 
   if (attachedModules.includes('dht22')) {
     html += `
-      <div class="bg-slate-950/60 p-3.5 rounded-xl border border-slate-800 space-y-2">
-        <div class="text-xs font-semibold text-slate-300">Simulador de Sensor DHT22</div>
+      <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1.5">
+        <div class="text-xs font-semibold text-slate-300">Simulador Sensor DHT22 (Pino D4)</div>
         <div>
-          <div class="flex justify-between text-[11px] text-slate-400">
+          <div class="flex justify-between text-[10px] text-slate-400">
             <span>Temperatura:</span>
             <span id="lbl-virtual-temp" class="text-cyan-400 font-bold">${virtualDhtTemp} °C</span>
           </div>
           <input type="range" min="10" max="50" step="0.5" value="${virtualDhtTemp}" oninput="updateVirtualDht(this.value, virtualDhtHum)" class="w-full accent-cyan-500 h-1 bg-slate-800 rounded">
         </div>
         <div>
-          <div class="flex justify-between text-[11px] text-slate-400">
+          <div class="flex justify-between text-[10px] text-slate-400">
             <span>Umidade:</span>
             <span id="lbl-virtual-hum" class="text-cyan-400 font-bold">${virtualDhtHum} %</span>
           </div>
@@ -2020,23 +1824,16 @@ function updateVirtualControls() {
 
   if (attachedModules.includes('oled_i2c')) {
     html += `
-      <div class="bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
-        <div class="text-xs font-semibold text-slate-300 mb-1">Display OLED I2C (128x64)</div>
-        <div class="text-[11px] text-emerald-400 flex items-center gap-1.5">
-          <i class="fa-solid fa-circle-check"></i> Renderizando ao vivo na tela 3D
+      <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+        <div class="text-xs font-semibold text-slate-300 mb-1">Display OLED I2C (Pinos D21/D22)</div>
+        <div class="text-[10px] text-emerald-400 flex items-center gap-1.5">
+          <i class="fa-solid fa-circle-check"></i> Renderizando ao vivo na tela 3D ao lado
         </div>
       </div>
     `;
   }
 
   container.innerHTML = html;
-}
-
-// Open pre-configured simulation in Wokwi
-function openWokwiSimulation() {
-  const url = "https://wokwi.com/projects/new/esp32";
-  window.open(url, '_blank');
-  showToast('Abrindo simulador online Wokwi!');
 }
 
 // --- FIRMWARE CODE GENERATOR ---
@@ -2049,7 +1846,6 @@ function generateFirmwareCode() {
   let setupCode = ['  Serial.begin(115200);', '  delay(500);', '  Serial.println("--- ESP32 Lab Iniciado ---");'];
   let loopCode = [];
 
-  // Always enable onboard led
   defines.push('#define LED_ONBOARD 2');
   setupCode.push('  pinMode(LED_ONBOARD, OUTPUT);');
 
@@ -2100,7 +1896,6 @@ function generateFirmwareCode() {
   }
 
   if (loopCode.length === 0) {
-    loopCode.push('  // Piscar LED onboard para indicar funcionamento');
     loopCode.push('  digitalWrite(LED_ONBOARD, HIGH);');
     loopCode.push('  delay(500);');
     loopCode.push('  digitalWrite(LED_ONBOARD, LOW);');
@@ -2109,7 +1904,7 @@ function generateFirmwareCode() {
 
   const fullCode = `// ==========================================
 // Código Firmware para ESP32 DevKit
-// Gerado por ESP32 3D Lab & Studio
+// Fiação Fiel 1:1 • ESP32 3D Lab v3.0
 // ==========================================
 
 ${includes.join('\n')}
@@ -2131,7 +1926,8 @@ ${loopCode.join('\n')}
 function copyGeneratedCode() {
   const code = document.getElementById('code-output').textContent;
   navigator.clipboard.writeText(code).then(() => {
-    showToast('Código copiado para a área de transferência!');
+    logTestEvent('Código de firmware copiado para a área de transferência.');
+    showToast('Código copiado com sucesso!');
   });
 }
 
@@ -2142,33 +1938,33 @@ function renderDatabaseExplorer() {
 
   container.innerHTML = moduleDatabase.map(mod => {
     return `
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 hover:border-cyan-500/40 transition flex flex-col justify-between shadow-lg">
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 hover:border-cyan-500/40 transition flex flex-col justify-between shadow-lg">
         <div>
-          <div class="flex items-center justify-between mb-3">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-lg shadow" style="background-color: ${mod.color}">
+          <div class="flex items-center justify-between mb-2">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-base shadow" style="background-color: ${mod.color}">
               <i class="fa-solid ${mod.icon}"></i>
             </div>
-            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-amber-400">
+            <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-amber-400">
               ${mod.voltage}
             </span>
           </div>
-          <h3 class="font-bold text-sm text-white">${mod.name}</h3>
-          <p class="text-xs text-slate-400 mt-1 leading-relaxed">${mod.desc}</p>
+          <h3 class="font-bold text-xs text-white">${mod.name}</h3>
+          <p class="text-[10px] text-slate-400 mt-0.5 leading-relaxed">${mod.desc}</p>
           
-          <div class="mt-3 pt-3 border-t border-slate-800/80">
-            <span class="text-[10px] uppercase tracking-wider text-slate-500 font-bold block mb-1.5">Pinos do Módulo:</span>
+          <div class="mt-2.5 pt-2 border-t border-slate-800/80">
+            <span class="text-[9px] uppercase tracking-wider text-slate-500 font-bold block mb-1">Pinos Físicos:</span>
             <div class="flex flex-wrap gap-1">
-              ${mod.pins.map(p => `<span class="text-[10px] bg-slate-950 px-2 py-0.5 rounded text-cyan-300 font-mono border border-slate-800">${p}</span>`).join('')}
+              ${mod.pins.map(p => `<span class="text-[9px] bg-slate-950 px-1.5 py-0.5 rounded text-cyan-300 font-mono border border-slate-800">${p}</span>`).join('')}
             </div>
           </div>
         </div>
 
-        <div class="mt-4 pt-3 flex items-center justify-between border-t border-slate-800">
-          <button onclick="startTeachingModule('${mod.id}')" class="text-xs text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1.5">
-            <i class="fa-solid fa-graduation-cap"></i> Me Ensinar
+        <div class="mt-3 pt-2.5 flex items-center justify-between border-t border-slate-800">
+          <button onclick="startTeachingModule('${mod.id}')" class="text-[10px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1">
+            <i class="fa-solid fa-graduation-cap"></i> Ensinar no 3D
           </button>
-          <button onclick="attachModule('${mod.id}'); switchView('3d')" class="px-3 py-1 bg-cyan-600/20 hover:bg-cyan-600 text-cyan-300 hover:text-white rounded-lg text-xs font-semibold transition">
-            Usar no 3D
+          <button onclick="attachModule('${mod.id}');" class="px-2.5 py-0.5 bg-cyan-600/20 hover:bg-cyan-600 text-cyan-300 hover:text-white rounded text-[10px] font-semibold transition">
+            Colocar no 3D
           </button>
         </div>
       </div>
@@ -2211,20 +2007,23 @@ function saveNewModule() {
   };
 
   moduleDatabase.push(newMod);
-  saveDatabase();
+  savePersistentState();
   renderCatalog();
   renderDatabaseExplorer();
   closeNewModuleModal();
+  logTestEvent(`Novo módulo cadastrado no banco: ${name}`);
   showToast(`Módulo "${name}" salvo com sucesso no banco!`);
 }
 
-// Export / Import
+// Export / Backup
 function exportProjectData() {
   const exportPayload = {
-    version: '2.0',
+    version: '3.0',
     timestamp: new Date().toISOString(),
     mcu: currentMcuId,
     attachedModules,
+    userNotes: userProjectNotes,
+    testLogs: testHistoryLogs,
     customDatabase: moduleDatabase
   };
 
@@ -2238,7 +2037,6 @@ function exportProjectData() {
   showToast('Backup JSON exportado com sucesso!');
 }
 
-// Toast notification helper
 function showToast(msg) {
   const toast = document.getElementById('toast');
   const toastMsg = document.getElementById('toast-msg');
