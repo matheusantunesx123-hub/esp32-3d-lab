@@ -33,6 +33,50 @@ const MCUS = {
     logicVoltage: '3.3V',
     leftPins: ['RST', 'A0', 'D0', 'D5', 'D6', 'D7', 'D8', '3V3'],
     rightPins: ['TX', 'RX', 'D1', 'D2', 'D3', 'D4', 'GND', '5V']
+  },
+  arduino_uno: {
+    id: 'arduino_uno',
+    name: 'Arduino Uno R3 (Nó Central de Sensores)',
+    pinsCount: 28,
+    logicVoltage: '5V',
+    leftPins: ['IOREF', 'RESET', '3.3V', '5V', 'GND', 'GND', 'VIN', 'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'NC'],
+    rightPins: ['D0/RX', 'D1/TX', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'D10', 'D11', 'D12', 'D13']
+  },
+  esp8266_esp01: {
+    id: 'esp8266_esp01',
+    name: 'ESP8266 ESP-01 / ESP-01S (8 Pinos Wi-Fi)',
+    pinsCount: 8,
+    logicVoltage: '3.3V',
+    leftPins: ['GND', 'GPIO2', 'GPIO0', 'RX'],
+    rightPins: ['TX', 'CH_PD', 'RST', 'VCC']
+  }
+};
+
+// --- Presets dos Projetos Separados do Ecossistema Snake ---
+const PROJECT_PRESETS = {
+  projeto1_central_esp32: {
+    id: 'projeto1_central_esp32',
+    name: 'Projeto 1: Central ESP32 RF 433MHz',
+    mcuId: 'esp32_wroom_30',
+    modules: ['rele_1ch', 'oled_i2c', 'rf433_tx'],
+    desc: 'Central ESP32 com Display OLED, Relé e Transmissor RF 433MHz (Alexa & Spotify).',
+    wokwiUrl: 'https://wokwi.com/projects/new/esp32'
+  },
+  projeto2_arduino_esp01: {
+    id: 'projeto2_arduino_esp01',
+    name: 'Projeto 2: Nó Sensor Arduino Uno + ESP-01',
+    mcuId: 'arduino_uno',
+    modules: ['esp01_modem', 'dht22', 'pir_hc_sr501'],
+    desc: 'Arduino Uno como nó hub de sensores lendo DHT22, PIR e Botão, usando ESP-01 (8 pinos) exclusivamente como modem Wi-Fi.',
+    wokwiUrl: 'https://wokwi.com/projects/new/arduino-uno'
+  },
+  custom: {
+    id: 'custom',
+    name: 'Bancada Livre / Customizada',
+    mcuId: 'esp32_wroom_30',
+    modules: ['rele_1ch'],
+    desc: 'Monte seus próprios circuitos combinando microcontroladores e módulos livremente.',
+    wokwiUrl: 'https://wokwi.com/projects/new/esp32'
   }
 };
 
@@ -255,10 +299,152 @@ const DEFAULT_MODULE_DATABASE = [
         explanation: 'Ligue o pino D18 do ESP32 ao pino ECHO do sensor.'
       }
     ]
+  },
+  {
+    id: 'esp01_modem',
+    name: 'Módulo ESP-01 / ESP-01S (8 Pinos Wi-Fi)',
+    category: 'comunicacao',
+    voltage: '3.3V',
+    color: '#0284c7',
+    icon: 'fa-wifi',
+    pins: ['3V3', 'GND', 'TX', 'RX', 'CH_PD', 'RST', 'GPIO0', 'GPIO2'],
+    defaultEspPins: { '3V3': '3.3V', 'GND': 'GND', 'TX': 'D10', 'RX': 'D11', 'CH_PD': '3.3V' },
+    wireColors: { '3V3': '#ef4444', 'GND': '#0f172a', 'TX': '#10b981', 'RX': '#f59e0b', 'CH_PD': '#ef4444' },
+    desc: 'Ponte Wi-Fi serial que roda comandos AT ou firmware bridge para dar conexão de rede ao Arduino Uno.',
+    tutorialSteps: [
+      {
+        title: 'Posicionamento e Identificação dos 8 Pinos',
+        wireName: 'Encaixe 2x4 Pinos',
+        wireColor: '#0284c7',
+        sourcePin: 'Protoboard',
+        destPin: 'Área Dedicada',
+        wireType: 'Barra 2x4',
+        explanation: 'O ESP-01 possui 8 pinos em duas fileiras de 4: [GND, GPIO2, GPIO0, RX] e [TX, CH_PD, RST, VCC]. Atenção: NUNCA alimente com 5V direto!'
+      },
+      {
+        title: 'Alimentação 3.3V e Habilitação (VCC + CH_PD)',
+        wireName: 'Fio Vermelho Duplo (3.3V)',
+        wireColor: '#ef4444',
+        sourcePin: 'Arduino / Fonte: Pino 3.3V',
+        destPin: 'ESP-01: Pinos VCC e CH_PD',
+        wireType: 'Macho-Fêmea',
+        explanation: 'O chip ESP8266 só inicializa se o pino CH_PD (Chip Enable) estiver em nível alto (3.3V) junto com o VCC. Ligue ambos no 3.3V.'
+      },
+      {
+        title: 'Aterramento Comum (GND)',
+        wireName: 'Fio Preto (GND)',
+        wireColor: '#0f172a',
+        sourcePin: 'Arduino: Pino GND',
+        destPin: 'ESP-01: Pino GND',
+        wireType: 'Macho-Fêmea',
+        explanation: 'Conecte o pino GND do Arduino ao GND do ESP-01 para compartilhar a referência de 0V.'
+      },
+      {
+        title: 'Recepção de Dados (TX do ESP -> D10 do Arduino)',
+        wireName: 'Fio Verde (TX -> RX Arduino)',
+        wireColor: '#10b981',
+        sourcePin: 'ESP-01: Pino TX (3.3V)',
+        destPin: 'Arduino: Pino D10 (SoftwareSerial RX)',
+        wireType: 'Direto Macho-Fêmea',
+        explanation: 'O pino TX do ESP solta nível lógico de 3.3V, que é perfeitamente reconhecido como nível ALTO pelo pino digital D10 do Arduino sem perigo.'
+      },
+      {
+        title: 'Envio Seguro com Divisor de Tensão (D11 do Arduino -> RX do ESP)',
+        wireName: 'Fio Laranja com Resistor 1kΩ + 2kΩ',
+        wireColor: '#f59e0b',
+        sourcePin: 'Arduino: Pino D11 (SoftwareSerial TX)',
+        destPin: 'ESP-01: Pino RX (via Divisor 1k/2k)',
+        wireType: 'Com Divisor Resistivo',
+        explanation: 'O Arduino envia 5V no pino D11. Para não queimar a entrada RX do ESP-01 (que suporta até 3.6V), use um resistor de 1kΩ em série com a linha e 2kΩ ligando ao GND (reduz de 5V para 3.3V).'
+      }
+    ]
+  },
+  {
+    id: 'rf433_tx',
+    name: 'Transmissor RF 433MHz (SYN115 / FS1000A)',
+    category: 'comunicacao',
+    voltage: '5V / 3.3V',
+    color: '#eab308',
+    icon: 'fa-tower-broadcast',
+    pins: ['VCC', 'DATA', 'GND'],
+    defaultEspPins: { 'VCC': 'VIN', 'GND': 'GND', 'DATA': 'D4' },
+    wireColors: { 'VCC': '#ef4444', 'GND': '#0f172a', 'DATA': '#eab308' },
+    desc: 'Emite sinais de rádio frequência 433.92MHz com codificação EV1527 para acionar tomadas, relés sem fio e fitas de LED.',
+    tutorialSteps: [
+      {
+        title: 'Alimentação do Módulo RF',
+        wireName: 'Fio Vermelho (5V)',
+        wireColor: '#ef4444',
+        sourcePin: 'ESP32: Pino VIN (5V)',
+        destPin: 'RF TX: Pino VCC',
+        wireType: 'Macho-Fêmea',
+        explanation: 'Embora funcione em 3.3V, alimentar o transmissor RF com 5V (pino VIN) dobra o alcance de transmissão pelo ar.'
+      },
+      {
+        title: 'Aterramento (GND)',
+        wireName: 'Fio Preto (GND)',
+        wireColor: '#0f172a',
+        sourcePin: 'ESP32: Pino GND',
+        destPin: 'RF TX: Pino GND',
+        wireType: 'Macho-Fêmea',
+        explanation: 'Ligue o pino GND do ESP32 ao pino GND do módulo transmissor.'
+      },
+      {
+        title: 'Linha de Dados Modulados (DATA)',
+        wireName: 'Fio Amarelo (DATA)',
+        wireColor: '#eab308',
+        sourcePin: 'ESP32: Pino D4 (GPIO 4)',
+        destPin: 'RF TX: Pino DATA / ATAD',
+        wireType: 'Macho-Fêmea',
+        explanation: 'Ligue o pino D4 do ESP32 ao pino de dados do transmissor. A biblioteca rc-switch modulará pulsos de 350µs no protocolo EV1527.'
+      }
+    ]
+  },
+  {
+    id: 'pir_hc_sr501',
+    name: 'Sensor de Presença PIR (HC-SR501)',
+    category: 'sensor',
+    voltage: '5V',
+    color: '#84cc16',
+    icon: 'fa-person-walking',
+    pins: ['VCC', 'OUT', 'GND'],
+    defaultEspPins: { 'VCC': '5V', 'GND': 'GND', 'OUT': 'D3' },
+    wireColors: { 'VCC': '#ef4444', 'GND': '#0f172a', 'OUT': '#84cc16' },
+    desc: 'Detecta movimento e presença humana por radiação infravermelha com cúpula de Fresnel.',
+    tutorialSteps: [
+      {
+        title: 'Alimentação 5V',
+        wireName: 'Fio Vermelho (5V)',
+        wireColor: '#ef4444',
+        sourcePin: 'Arduino: Pino 5V',
+        destPin: 'PIR: Pino VCC',
+        wireType: 'Macho-Fêmea',
+        explanation: 'O sensor PIR requer 5V no pino VCC para alimentar seu regulador interno de 3.3V.'
+      },
+      {
+        title: 'Aterramento (GND)',
+        wireName: 'Fio Preto (GND)',
+        wireColor: '#0f172a',
+        sourcePin: 'Arduino: Pino GND',
+        destPin: 'PIR: Pino GND',
+        wireType: 'Macho-Fêmea',
+        explanation: 'Ligue o pino GND do Arduino ao pino GND do sensor PIR.'
+      },
+      {
+        title: 'Saída Digital de Movimento (OUT)',
+        wireName: 'Fio Verde Claro (OUT)',
+        wireColor: '#84cc16',
+        sourcePin: 'PIR: Pino OUT',
+        destPin: 'Arduino: Pino D3',
+        wireType: 'Macho-Fêmea',
+        explanation: 'O pino OUT solta nível HIGH (3.3V) sempre que detecta movimento. O Arduino lê normalmente na porta D3.'
+      }
+    ]
   }
 ];
 
 // --- Persistent Application State ---
+let currentProjectId = 'projeto1_central_esp32';
 let currentMcuId = 'esp32_wroom_30';
 let moduleDatabase = [];
 let attachedModules = [];
@@ -315,6 +501,7 @@ function savePersistentState() {
   const statePayload = {
     version: '3.0',
     timestamp: new Date().toISOString(),
+    currentProjectId,
     currentMcuId,
     attachedModules,
     virtualPower,
@@ -340,8 +527,9 @@ function loadPersistentState() {
     const saved = localStorage.getItem('esp32_lab_state_v3');
     if (saved) {
       const data = JSON.parse(saved);
+      currentProjectId = data.currentProjectId || 'projeto1_central_esp32';
       currentMcuId = data.currentMcuId || 'esp32_wroom_30';
-      attachedModules = data.attachedModules || ['rele_1ch'];
+      attachedModules = data.attachedModules || ['rele_1ch', 'oled_i2c', 'rf433_tx'];
       virtualPower = !!data.virtualPower;
       virtualLedState = !!data.virtualLedState;
       virtualRelayState = !!data.virtualRelayState;
@@ -355,6 +543,12 @@ function loadPersistentState() {
       if (notesEl) notesEl.value = userProjectNotes;
       const mcuSelect = document.getElementById('mcu-select');
       if (mcuSelect) mcuSelect.value = currentMcuId;
+      const projSelect = document.getElementById('project-select');
+      if (projSelect) projSelect.value = currentProjectId;
+      const descEl = document.getElementById('project-desc-badge');
+      if (descEl && PROJECT_PRESETS[currentProjectId]) {
+        descEl.innerHTML = `<i class="fa-solid fa-circle-info text-cyan-400 mr-1"></i> ${PROJECT_PRESETS[currentProjectId].desc}`;
+      }
       return;
     }
   } catch (e) {
@@ -363,9 +557,9 @@ function loadPersistentState() {
 
   // Fallback defaults
   moduleDatabase = [...DEFAULT_MODULE_DATABASE];
-  attachedModules = ['rele_1ch'];
+  attachedModules = ['rele_1ch', 'oled_i2c', 'rf433_tx'];
   testHistoryLogs = [
-    { timestamp: new Date().toLocaleTimeString(), text: 'Sessão iniciada com ESP32 DevKit V1 e Módulo Relé.' }
+    { timestamp: new Date().toLocaleTimeString(), text: 'Sessão iniciada: Central ESP32 RF 433MHz.' }
   ];
 }
 
@@ -480,6 +674,131 @@ function toggleSplitMode() {
   } else {
     switchView('3d');
   }
+}
+
+// --- Project Separation Management ---
+function onProjectChange(projId) {
+  currentProjectId = projId;
+  const proj = PROJECT_PRESETS[projId];
+  const descEl = document.getElementById('project-desc-badge');
+  if (descEl && proj) {
+    descEl.innerHTML = `<i class="fa-solid fa-circle-info text-cyan-400 mr-1"></i> ${proj.desc}`;
+  }
+
+  if (proj && projId !== 'custom') {
+    currentMcuId = proj.mcuId;
+    attachedModules = [...proj.modules];
+    const mcuSelect = document.getElementById('mcu-select');
+    if (mcuSelect) mcuSelect.value = currentMcuId;
+    const mcu = MCUS[currentMcuId];
+    if (mcu) {
+      const hudEl = document.getElementById('hud-mcu-name');
+      if (hudEl) hudEl.textContent = mcu.name;
+      const badgeEl = document.getElementById('inspector-mcu-badge');
+      if (badgeEl) badgeEl.textContent = `${mcu.pinsCount} Pinos`;
+      const lvlEl = document.getElementById('mcu-level-badge');
+      if (lvlEl) lvlEl.innerHTML = `<i class="fa-solid fa-bolt text-amber-400"></i> Nível: ${mcu.logicVoltage}`;
+      const wifiEl = document.getElementById('mcu-wifi-badge');
+      if (wifiEl) {
+        wifiEl.innerHTML = currentMcuId === 'arduino_uno' 
+          ? '<i class="fa-solid fa-microchip text-slate-400"></i> ATmega328P 5V' 
+          : '<i class="fa-solid fa-wifi text-cyan-400"></i> 2.4GHz Wi-Fi';
+      }
+    }
+    renderAttachedModules();
+    rebuild3dScene();
+    updatePhysicalWiringGuide();
+    generateFirmwareCode();
+    updateVirtualControls();
+    renderCatalog();
+    logTestEvent(`Projeto alternado para: ${proj.name}`);
+    showToast(`Carregado: ${proj.name}`);
+  }
+  savePersistentState();
+}
+
+function loadWokwiProject(projType) {
+  const iframe = document.getElementById('wokwi-iframe');
+  const extBtn = document.getElementById('wokwi-external-btn');
+  const btn1 = document.getElementById('wokwi-btn-proj1');
+  const btn2 = document.getElementById('wokwi-btn-proj2');
+
+  if (projType === 'esp32') {
+    if (iframe) iframe.src = 'https://wokwi.com/projects/new/esp32';
+    if (extBtn) extBtn.href = 'https://wokwi.com/projects/new/esp32';
+    if (btn1) btn1.className = 'px-2.5 py-1 text-xs rounded-lg font-bold bg-cyan-600 text-white shadow transition';
+    if (btn2) btn2.className = 'px-2.5 py-1 text-xs rounded-lg font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 transition';
+    showToast('Simulador Wokwi: Central ESP32 carregado!');
+  } else {
+    if (iframe) iframe.src = 'https://wokwi.com/projects/new/arduino-uno';
+    if (extBtn) extBtn.href = 'https://wokwi.com/projects/new/arduino-uno';
+    if (btn2) btn2.className = 'px-2.5 py-1 text-xs rounded-lg font-bold bg-cyan-600 text-white shadow transition';
+    if (btn1) btn1.className = 'px-2.5 py-1 text-xs rounded-lg font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 transition';
+    showToast('Simulador Wokwi: Arduino Uno + ESP-01 carregado!');
+  }
+}
+
+function copyProjectDiagramJson() {
+  let diagramData = '';
+  if (currentProjectId === 'projeto2_arduino_esp01') {
+    diagramData = JSON.stringify({
+      version: 1,
+      author: "Matheus Snake Eco",
+      editor: "wokwi",
+      parts: [
+        { type: "wokwi-arduino-uno", id: "uno", top: 0, left: 0, attrs: {} },
+        { type: "board-esp-01s", id: "esp01", top: -140, left: 160, attrs: {} },
+        { type: "wokwi-dht22", id: "dht", top: 120, left: 240, attrs: {} },
+        { type: "wokwi-pir-motion-sensor", id: "pir", top: 120, left: 420, attrs: {} }
+      ],
+      connections: [
+        [ "uno:5V", "dht:VCC", "red", [ "v0" ] ],
+        [ "uno:GND.1", "dht:GND", "black", [ "v0" ] ],
+        [ "uno:2", "dht:SDA", "blue", [ "v0" ] ],
+        [ "uno:5V", "pir:VCC", "red", [ "v0" ] ],
+        [ "uno:GND.1", "pir:GND", "black", [ "v0" ] ],
+        [ "uno:3", "pir:OUT", "green", [ "v0" ] ],
+        [ "uno:3.3V", "esp01:3V3", "red", [ "v0" ] ],
+        [ "uno:3.3V", "esp01:EN", "red", [ "v0" ] ],
+        [ "uno:GND.2", "esp01:GND", "black", [ "v0" ] ],
+        [ "esp01:TX", "uno:10", "green", [ "v0" ] ],
+        [ "uno:11", "esp01:RX", "orange", [ "v0" ] ]
+      ]
+    }, null, 2);
+  } else {
+    diagramData = JSON.stringify({
+      version: 1,
+      author: "Matheus Snake Eco",
+      editor: "wokwi",
+      parts: [
+        { type: "board-esp32-devkit-c-v4", id: "esp", top: 0, left: 0, attrs: {} },
+        { type: "board-ssd1306", id: "oled", top: -120, left: 80, attrs: { i2cAddress: "0x3c" } },
+        { type: "wokwi-relay-module", id: "relay", top: 120, left: 180, attrs: {} }
+      ],
+      connections: [
+        [ "esp:3V3", "oled:VCC", "red", [ "v0" ] ],
+        [ "esp:GND.1", "oled:GND", "black", [ "v0" ] ],
+        [ "esp:22", "oled:SCL", "purple", [ "v0" ] ],
+        [ "esp:21", "oled:SDA", "blue", [ "v0" ] ],
+        [ "esp:5V", "relay:VCC", "red", [ "v0" ] ],
+        [ "esp:GND.2", "relay:GND", "black", [ "v0" ] ],
+        [ "esp:15", "relay:IN", "yellow", [ "v0" ] ]
+      ]
+    }, null, 2);
+  }
+  navigator.clipboard.writeText(diagramData).then(() => {
+    showToast('diagram.json copiado!');
+  }).catch(() => {
+    showToast('Copie o código do arquivo diagram.json.');
+  });
+}
+
+function copyCurrentFirmwareCode() {
+  const codeEl = document.getElementById('code-output');
+  if (!codeEl) return;
+  navigator.clipboard.writeText(codeEl.value).then(() => {
+    showToast('sketch.ino copiado!');
+  });
 }
 
 // --- MCU Selection ---
@@ -1313,10 +1632,125 @@ function createAttachedModules3D(group) {
     else if (modId === 'dht22') createDht223D(modGroup);
     else if (modId === 'oled_i2c') createOled3D(modGroup);
     else if (modId === 'hc_sr04') createUltrasonic3D(modGroup);
+    else if (modId === 'esp01_modem') createEsp013D(modGroup);
+    else if (modId === 'rf433_tx') createRf4333D(modGroup);
+    else if (modId === 'pir_hc_sr501') createPir3D(modGroup);
     else createGenericModule3D(modGroup, modId);
 
     group.add(modGroup);
     offsetX += 5.0;
+  });
+}
+
+function createEsp013D(group) {
+  // PCB preta compacta 2.5 x 1.5 cm
+  const pcb = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.16, 1.6), new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4 }));
+  pcb.position.y = 0.08;
+  pcb.castShadow = true;
+  group.add(pcb);
+
+  // Antena Wi-Fi dourada zigue-zague impressa
+  const antenna = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.04, 1.3), new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.8, roughness: 0.2 }));
+  antenna.position.set(0.8, 0.18, 0);
+  group.add(antenna);
+
+  // Chip ESP8266EX quadrado preto
+  const chip = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.12, 0.7), new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.3 }));
+  chip.position.set(0.0, 0.2, -0.2);
+  group.add(chip);
+
+  // Conector fêmea / pinos 2x4
+  const header = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.7, 1.2), new THREE.MeshStandardMaterial({ color: 0x020617, roughness: 0.7 }));
+  header.position.set(-0.9, 0.4, 0);
+  group.add(header);
+
+  // LED azul Wi-Fi piscante quando energizado
+  const wifiLedMat = new THREE.MeshStandardMaterial({
+    color: virtualPower ? 0x38bdf8 : 0x0c4a6e,
+    emissive: virtualPower ? 0x38bdf8 : 0x000000,
+    emissiveIntensity: virtualPower ? 2.5 : 0
+  });
+  const wifiLed = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.12, 0.18), wifiLedMat);
+  wifiLed.position.set(0.0, 0.2, 0.5);
+  group.add(wifiLed);
+
+  // Pinos interativos do ESP-01 para fiação
+  const pinNames = ['GND', 'GPIO2', 'GPIO0', 'RX', 'TX', 'CH_PD', 'RST', 'VCC'];
+  const pinGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.5, 6);
+  const pinMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.9 });
+  pinNames.forEach((name, i) => {
+    const row = i < 4 ? -0.25 : 0.25;
+    const col = -0.45 + ((i % 4) * 0.3);
+    const p = new THREE.Mesh(pinGeo, pinMat);
+    p.position.set(-0.9 + row, 0.8, col);
+    p.userData = { isPin: true, modulePin: true, moduleId: 'esp01_modem', name: name };
+    group.add(p);
+    interactivePins.push(p);
+  });
+}
+
+function createRf4333D(group) {
+  // PCB Verde Transmissor RF 433MHz
+  const pcb = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.18, 2.0), new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.4 }));
+  pcb.position.y = 0.09;
+  pcb.castShadow = true;
+  group.add(pcb);
+
+  // Bobina de cobre de RF
+  const coil = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.8, 12), new THREE.MeshStandardMaterial({ color: 0xb45309, metalness: 0.9, roughness: 0.3 }));
+  coil.rotation.z = Math.PI / 2;
+  coil.position.set(0.2, 0.35, 0.3);
+  group.add(coil);
+
+  // Cristal de quartzo prateado SAW 433.92MHz
+  const crystal = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 0.15, 16), new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.95, roughness: 0.1 }));
+  crystal.position.set(-0.4, 0.25, -0.3);
+  group.add(crystal);
+
+  // Barra de 3 pinos (VCC, DATA, GND)
+  const pins = ['VCC', 'DATA', 'GND'];
+  const pGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.6, 6);
+  const pMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.9 });
+  pins.forEach((name, i) => {
+    const p = new THREE.Mesh(pGeo, pMat);
+    p.position.set(-0.6 + (i * 0.6), 0.45, 0.8);
+    p.userData = { isPin: true, modulePin: true, moduleId: 'rf433_tx', name: name };
+    group.add(p);
+    interactivePins.push(p);
+  });
+}
+
+function createPir3D(group) {
+  // PCB Verde HC-SR501
+  const pcb = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.2, 2.4), new THREE.MeshStandardMaterial({ color: 0x166534, roughness: 0.4 }));
+  pcb.position.y = 0.1;
+  pcb.castShadow = true;
+  group.add(pcb);
+
+  // Cúpula semiesférica branca Fresnel
+  const domeMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25, opacity: 0.92, transparent: true });
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(1.0, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2), domeMat);
+  dome.position.set(0, 0.2, 0);
+  group.add(dome);
+
+  // Trimpots de ajuste de sensibilidade e tempo
+  const pot1 = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.25, 8), new THREE.MeshStandardMaterial({ color: 0xeab308 }));
+  pot1.position.set(1.1, 0.3, -0.6);
+  group.add(pot1);
+  const pot2 = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.25, 8), new THREE.MeshStandardMaterial({ color: 0xeab308 }));
+  pot2.position.set(1.1, 0.3, 0.6);
+  group.add(pot2);
+
+  // Barra de 3 pinos (VCC, OUT, GND)
+  const pins = ['VCC', 'OUT', 'GND'];
+  const pGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.6, 6);
+  const pMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.9 });
+  pins.forEach((name, i) => {
+    const p = new THREE.Mesh(pGeo, pMat);
+    p.position.set(-1.2, 0.45, -0.5 + (i * 0.5));
+    p.userData = { isPin: true, modulePin: true, moduleId: 'pir_hc_sr501', name: name };
+    group.add(p);
+    interactivePins.push(p);
   });
 }
 
@@ -1841,70 +2275,99 @@ function generateFirmwareCode() {
   const codeOutput = document.getElementById('code-output');
   if (!codeOutput) return;
 
+  const isArduino = currentMcuId === 'arduino_uno';
+
   let includes = ['#include <Arduino.h>'];
   let defines = [];
-  let setupCode = ['  Serial.begin(115200);', '  delay(500);', '  Serial.println("--- ESP32 Lab Iniciado ---");'];
+  let setupCode = [
+    '  Serial.begin(9600);',
+    '  delay(500);',
+    `  Serial.println("--- ${isArduino ? 'Arduino Uno Hub' : 'ESP32 Lab'} Iniciado ---");`
+  ];
   let loopCode = [];
 
-  defines.push('#define LED_ONBOARD 2');
-  setupCode.push('  pinMode(LED_ONBOARD, OUTPUT);');
-
-  if (attachedModules.includes('rele_1ch')) {
-    defines.push('#define RELAY_PIN 23');
-    setupCode.push('  pinMode(RELAY_PIN, OUTPUT);');
-    setupCode.push('  digitalWrite(RELAY_PIN, LOW); // Relé desligado');
-    loopCode.push('  // Teste de acionamento do Relé');
-    loopCode.push('  digitalWrite(RELAY_PIN, HIGH);');
-    loopCode.push('  digitalWrite(LED_ONBOARD, HIGH);');
-    loopCode.push('  Serial.println("Relé ATIVADO!");');
+  if (isArduino) {
+    defines.push('// Modo Arduino Uno: Hub de Sensores com Ponte Wi-Fi ESP-01');
+    if (attachedModules.includes('esp01_modem')) {
+      includes.push('#include <SoftwareSerial.h>');
+      defines.push('SoftwareSerial espSerial(10, 11); // RX=D10 (do TX do ESP), TX=D11 (para RX do ESP via divisor 1k/2k)');
+      setupCode.push('  espSerial.begin(9600);');
+      setupCode.push('  Serial.println("Comunicacao SoftwareSerial com ESP-01 pronta.");');
+      loopCode.push('  // Envia pacote de telemetria serial para o ESP-01');
+      loopCode.push('  espSerial.print("TELEMETRY:");');
+    }
+    if (attachedModules.includes('dht22')) {
+      includes.push('#include <DHT.h>');
+      defines.push('#define DHTPIN 2');
+      defines.push('#define DHTTYPE DHT22');
+      defines.push('DHT dht(DHTPIN, DHTTYPE);');
+      setupCode.push('  dht.begin();');
+      loopCode.push('  float temp = dht.readTemperature();');
+      loopCode.push('  float umid = dht.readHumidity();');
+      loopCode.push('  Serial.print("Temp: "); Serial.print(temp); Serial.print(" C | Umid: "); Serial.println(umid);');
+      if (attachedModules.includes('esp01_modem')) {
+        loopCode.push('  espSerial.print("temp="); espSerial.print(temp); espSerial.print("&umid="); espSerial.print(umid);');
+      }
+    }
+    if (attachedModules.includes('pir_hc_sr501')) {
+      defines.push('#define PIR_PIN 3');
+      setupCode.push('  pinMode(PIR_PIN, INPUT);');
+      loopCode.push('  int presenca = digitalRead(PIR_PIN);');
+      loopCode.push('  if (presenca == HIGH) { Serial.println(">>> MOVIMENTO DETECTADO!"); }');
+      if (attachedModules.includes('esp01_modem')) {
+        loopCode.push('  espSerial.print("&pir="); espSerial.println(presenca);');
+      }
+    }
     loopCode.push('  delay(2000);');
-    loopCode.push('  digitalWrite(RELAY_PIN, LOW);');
-    loopCode.push('  digitalWrite(LED_ONBOARD, LOW);');
-    loopCode.push('  Serial.println("Relé DESLIGADO!");');
-    loopCode.push('  delay(2000);');
-  }
+  } else {
+    defines.push('#define LED_ONBOARD 2');
+    setupCode.push('  pinMode(LED_ONBOARD, OUTPUT);');
 
-  if (attachedModules.includes('dht22')) {
-    includes.push('#include <DHT.h>');
-    defines.push('#define DHTPIN 4');
-    defines.push('#define DHTTYPE DHT22');
-    defines.push('DHT dht(DHTPIN, DHTTYPE);');
-    setupCode.push('  dht.begin();');
-    loopCode.push('  float temp = dht.readTemperature();');
-    loopCode.push('  float umid = dht.readHumidity();');
-    loopCode.push('  Serial.printf("Temperatura: %.1f C | Umidade: %.1f %%\\n", temp, umid);');
-  }
+    if (attachedModules.includes('rele_1ch')) {
+      defines.push('#define RELAY_PIN 15');
+      setupCode.push('  pinMode(RELAY_PIN, OUTPUT);');
+      setupCode.push('  digitalWrite(RELAY_PIN, LOW); // Relé desligado');
+      loopCode.push('  // Aciona relé e LED');
+      loopCode.push('  digitalWrite(RELAY_PIN, HIGH);');
+      loopCode.push('  digitalWrite(LED_ONBOARD, HIGH);');
+      loopCode.push('  delay(2000);');
+      loopCode.push('  digitalWrite(RELAY_PIN, LOW);');
+      loopCode.push('  digitalWrite(LED_ONBOARD, LOW);');
+      loopCode.push('  delay(2000);');
+    }
 
-  if (attachedModules.includes('oled_i2c')) {
-    includes.push('#include <Wire.h>');
-    includes.push('#include <Adafruit_GFX.h>');
-    includes.push('#include <Adafruit_SSD1306.h>');
-    defines.push('#define SCREEN_WIDTH 128');
-    defines.push('#define SCREEN_HEIGHT 64');
-    defines.push('Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);');
-    setupCode.push('  Wire.begin(21, 22); // SDA, SCL');
-    setupCode.push('  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {');
-    setupCode.push('    Serial.println("Falha ao iniciar OLED SSD1306");');
-    setupCode.push('  } else {');
-    setupCode.push('    display.clearDisplay();');
-    setupCode.push('    display.setTextSize(1);');
-    setupCode.push('    display.setTextColor(WHITE);');
-    setupCode.push('    display.setCursor(0, 10);');
-    setupCode.push('    display.println("ESP32 3D Lab");');
-    setupCode.push('    display.display();');
-    setupCode.push('  }');
-  }
+    if (attachedModules.includes('rf433_tx')) {
+      includes.push('#include <RCSwitch.h>');
+      defines.push('#define RF_PIN 4');
+      defines.push('RCSwitch rfTransmitter = RCSwitch();');
+      setupCode.push('  rfTransmitter.enableTransmit(RF_PIN);');
+      setupCode.push('  rfTransmitter.setPulseLength(350);');
+      loopCode.push('  // Envia código RF EV1527 (ex: tomada ligar)');
+      loopCode.push('  rfTransmitter.send(1234567, 24);');
+      loopCode.push('  Serial.println("Sinal RF 433MHz transmitido!");');
+    }
 
-  if (loopCode.length === 0) {
-    loopCode.push('  digitalWrite(LED_ONBOARD, HIGH);');
-    loopCode.push('  delay(500);');
-    loopCode.push('  digitalWrite(LED_ONBOARD, LOW);');
-    loopCode.push('  delay(500);');
+    if (attachedModules.includes('oled_i2c')) {
+      includes.push('#include <Wire.h>');
+      includes.push('#include <Adafruit_GFX.h>');
+      includes.push('#include <Adafruit_SSD1306.h>');
+      defines.push('#define SCREEN_WIDTH 128');
+      defines.push('#define SCREEN_HEIGHT 64');
+      defines.push('Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);');
+      setupCode.push('  Wire.begin(21, 22); // SDA, SCL');
+      setupCode.push('  if(display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {');
+      setupCode.push('    display.clearDisplay();');
+      setupCode.push('    display.setTextSize(1); display.setTextColor(WHITE);');
+      setupCode.push('    display.setCursor(0, 10); display.println("Central ESP32 RF");');
+      setupCode.push('    display.display();');
+      setupCode.push('  }');
+    }
   }
 
   const fullCode = `// ==========================================
-// Código Firmware para ESP32 DevKit
-// Fiação Fiel 1:1 • ESP32 3D Lab v3.0
+// Código Firmware para ${isArduino ? 'Arduino Uno R3 (Nó Hub)' : 'ESP32 DevKit'}
+// Projeto: ${PROJECT_PRESETS[currentProjectId] ? PROJECT_PRESETS[currentProjectId].name : 'Personalizado'}
+// Fiação Fiel 1:1 • ESP32 & Arduino 3D Lab Studio
 // ==========================================
 
 ${includes.join('\n')}
