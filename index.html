@@ -291,20 +291,46 @@
           </div>
         </div>
 
-        <!-- SUB-PANEL 3: Simulador Wokwi Embutido -->
+        <!-- SUB-PANEL 3: Simulador Wokwi Embutido & Sincronização Ativa -->
         <div id="subview-wokwi" class="p-5 md:p-6 space-y-4 hidden flex-1 flex flex-col">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-3 gap-2">
             <div>
               <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                <i class="fa-solid fa-microchip text-amber-400"></i> Simulador Wokwi Integrado
+                <i class="fa-solid fa-microchip text-amber-400"></i> Wokwi Sync & Simulador Ativo
+                <span id="wokwi-live-badge" class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 font-mono animate-pulse">Sincronizado ao Vivo</span>
               </h2>
-              <p class="text-xs text-slate-400 mt-0.5">Alterne entre a Central ESP32 e o Nó Sensor Arduino Uno com ESP-01.</p>
+              <p class="text-xs text-slate-400 mt-0.5">Sincronização bidirecional em tempo real: qualquer módulo adicionado no 3D gera o diagram.json e firmware no Wokwi.</p>
             </div>
             <div class="flex items-center gap-2">
+              <button onclick="openWokwiImportModal()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-semibold rounded-lg border border-cyan-800 transition flex items-center gap-1.5" title="Importar qualquer diagram.json do Wokwi para a bancada 3D">
+                <i class="fa-solid fa-file-import"></i> Importar do Wokwi
+              </button>
               <a id="wokwi-external-btn" href="https://wokwi.com/projects/new/esp32" target="_blank" class="px-3 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-lg transition shadow flex items-center gap-1.5">
-                <i class="fa-solid fa-external-link"></i> Abrir em Nova Aba
+                <i class="fa-solid fa-external-link"></i> Abrir no Wokwi
               </a>
             </div>
+          </div>
+
+          <!-- Live Sync Status Banner -->
+          <div class="p-2.5 bg-cyan-950/40 border border-cyan-800/60 rounded-xl flex items-center justify-between text-xs text-cyan-200">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+              <span id="wokwi-sync-summary">Central Ativa: ESP32 com 3 módulos (Relé, OLED, RF 433) • 6 peças no Wokwi</span>
+            </div>
+            <span class="text-[10px] text-slate-400 font-mono hidden md:inline">Hot Reload Ativo</span>
+          </div>
+
+          <!-- Sub-tabs within Wokwi panel (Simulator / diagram.json / sketch.ino) -->
+          <div class="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs">
+            <button id="wokwi-tab-sim" onclick="switchWokwiSubTab('sim')" class="px-3 py-1.5 rounded-lg font-bold bg-cyan-600 text-white shadow transition">
+              <i class="fa-solid fa-play mr-1"></i> Simulador Interativo
+            </button>
+            <button id="wokwi-tab-diagram" onclick="switchWokwiSubTab('diagram')" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition">
+              <i class="fa-solid fa-diagram-project mr-1 text-cyan-400"></i> diagram.json Sincronizado
+            </button>
+            <button id="wokwi-tab-code" onclick="switchWokwiSubTab('code')" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition">
+              <i class="fa-solid fa-code mr-1 text-emerald-400"></i> sketch.ino Sincronizado
+            </button>
           </div>
 
           <!-- Quick Switcher Bar for Wokwi Simulation Projects -->
@@ -319,17 +345,44 @@
               </button>
             </div>
             <div class="flex items-center gap-1.5">
-              <button onclick="copyProjectDiagramJson()" class="px-2 py-1 text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 flex items-center gap-1" title="Copiar diagram.json">
-                <i class="fa-solid fa-diagram-project text-cyan-400"></i> Copiar diagram.json
+              <button onclick="copyProjectDiagramJson()" class="px-2.5 py-1 text-[11px] bg-slate-800 hover:bg-slate-700 text-cyan-300 rounded border border-slate-700 flex items-center gap-1 shadow" title="Copiar diagram.json">
+                <i class="fa-solid fa-copy text-cyan-400"></i> Copiar diagram.json
               </button>
-              <button onclick="copyCurrentFirmwareCode()" class="px-2 py-1 text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 flex items-center gap-1" title="Copiar sketch.ino">
+              <button onclick="copyCurrentFirmwareCode()" class="px-2.5 py-1 text-[11px] bg-slate-800 hover:bg-slate-700 text-emerald-300 rounded border border-slate-700 flex items-center gap-1 shadow" title="Copiar sketch.ino">
                 <i class="fa-solid fa-code text-emerald-400"></i> Copiar sketch.ino
               </button>
             </div>
           </div>
 
-          <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex-1 flex flex-col min-h-[480px]">
-            <iframe id="wokwi-iframe" src="https://wokwi.com/projects/new/esp32" class="w-full flex-1 rounded-lg border border-slate-800 min-h-[440px]" title="Wokwi ESP32 Simulator"></iframe>
+          <!-- Wokwi Subview: Simulator Iframe -->
+          <div id="wokwi-view-sim" class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex-1 flex flex-col min-h-[480px]">
+            <iframe id="wokwi-iframe" src="https://wokwi.com/projects/new/esp32" class="w-full flex-1 rounded-lg border border-slate-800 min-h-[440px]" title="Wokwi Simulator"></iframe>
+          </div>
+
+          <!-- Wokwi Subview: Live diagram.json Editor / Viewer -->
+          <div id="wokwi-view-diagram" class="bg-slate-900 border border-slate-800 rounded-xl p-4 hidden flex-1 flex flex-col min-h-[480px]">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                <i class="fa-solid fa-diagram-project text-cyan-400"></i> Wokwi diagram.json (Atualizado em tempo real com a bancada 3D)
+              </span>
+              <button onclick="copyProjectDiagramJson()" class="px-2.5 py-1 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded shadow transition">
+                <i class="fa-solid fa-copy mr-1"></i> Copiar JSON
+              </button>
+            </div>
+            <textarea id="live-diagram-json-output" readonly class="w-full flex-1 bg-slate-950 text-cyan-300 font-mono text-xs p-3 rounded-lg border border-slate-800 focus:outline-none min-h-[380px]"></textarea>
+          </div>
+
+          <!-- Wokwi Subview: Live sketch.ino Viewer -->
+          <div id="wokwi-view-code" class="bg-slate-900 border border-slate-800 rounded-xl p-4 hidden flex-1 flex flex-col min-h-[480px]">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                <i class="fa-solid fa-code text-emerald-400"></i> Wokwi sketch.ino (Pronto para compilar)
+              </span>
+              <button onclick="copyCurrentFirmwareCode()" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded shadow transition">
+                <i class="fa-solid fa-copy mr-1"></i> Copiar Código
+              </button>
+            </div>
+            <textarea id="live-sketch-code-output" readonly class="w-full flex-1 bg-slate-950 text-emerald-300 font-mono text-xs p-3 rounded-lg border border-slate-800 focus:outline-none min-h-[380px]"></textarea>
           </div>
         </div>
 
@@ -575,6 +628,44 @@
       <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
         <button onclick="closeNewModuleModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-xl font-medium transition">Cancelar</button>
         <button onclick="saveNewModule()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs rounded-xl font-bold transition">Salvar no Banco</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Importar Projeto do Wokwi (diagram.json) -->
+  <div id="modal-import-wokwi" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-xl p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="font-bold text-base text-white flex items-center gap-2">
+          <i class="fa-solid fa-file-import text-amber-400"></i> Importar Projeto do Wokwi (diagram.json)
+        </h3>
+        <button onclick="closeWokwiImportModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <p class="text-xs text-slate-300 leading-relaxed">
+        Cole o conteúdo do arquivo <code class="text-cyan-300 font-mono">diagram.json</code> de qualquer projeto seu do Wokwi. A bancada 3D reconhecerá automaticamente a placa (Arduino ou ESP32), todos os módulos e montará a fiação fiel correspondente!
+      </p>
+
+      <div>
+        <textarea id="import-wokwi-json-input" rows="10" placeholder='Cole seu diagram.json aqui... Exemplo:
+{
+  "version": 1,
+  "parts": [
+    { "type": "wokwi-arduino-uno", "id": "uno" },
+    { "type": "wokwi-dht22", "id": "dht" }
+  ],
+  "connections": [
+    [ "uno:2", "dht:SDA", "blue" ]
+  ]
+}' class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-cyan-200 focus:outline-none focus:border-cyan-500"></textarea>
+      </div>
+
+      <div class="flex items-center justify-between pt-3 border-t border-slate-800">
+        <span class="text-[11px] text-slate-400">Suporta ESP32, Arduino Uno, ESP-01, Relé, OLED, DHT22, HC-SR04, PIR e LEDs</span>
+        <div class="flex items-center gap-2">
+          <button onclick="closeWokwiImportModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-xl font-medium transition">Cancelar</button>
+          <button onclick="applyWokwiImport()" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-cyan-500 hover:from-amber-400 hover:to-cyan-400 text-slate-950 text-xs rounded-xl font-bold transition shadow">Montar na Bancada 3D</button>
+        </div>
       </div>
     </div>
   </div>
