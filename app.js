@@ -490,6 +490,7 @@ window.addEventListener('DOMContentLoaded', () => {
   renderAttachedModules();
   updatePhysicalWiringGuide();
   generateFirmwareCode();
+  generateLiveWokwiState();
   renderDatabaseExplorer();
   updateVirtualControls();
   renderHistoryLogs();
@@ -709,11 +710,13 @@ function onProjectChange(projId) {
     rebuild3dScene();
     updatePhysicalWiringGuide();
     generateFirmwareCode();
+    generateLiveWokwiState();
     updateVirtualControls();
     renderCatalog();
     logTestEvent(`Projeto alternado para: ${proj.name}`);
     showToast(`Carregado: ${proj.name}`);
   }
+  generateLiveWokwiState();
   savePersistentState();
 }
 
@@ -739,65 +742,22 @@ function loadWokwiProject(projType) {
 }
 
 function copyProjectDiagramJson() {
-  let diagramData = '';
-  if (currentProjectId === 'projeto2_arduino_esp01') {
-    diagramData = JSON.stringify({
-      version: 1,
-      author: "Matheus Snake Eco",
-      editor: "wokwi",
-      parts: [
-        { type: "wokwi-arduino-uno", id: "uno", top: 0, left: 0, attrs: {} },
-        { type: "board-esp-01s", id: "esp01", top: -140, left: 160, attrs: {} },
-        { type: "wokwi-dht22", id: "dht", top: 120, left: 240, attrs: {} },
-        { type: "wokwi-pir-motion-sensor", id: "pir", top: 120, left: 420, attrs: {} }
-      ],
-      connections: [
-        [ "uno:5V", "dht:VCC", "red", [ "v0" ] ],
-        [ "uno:GND.1", "dht:GND", "black", [ "v0" ] ],
-        [ "uno:2", "dht:SDA", "blue", [ "v0" ] ],
-        [ "uno:5V", "pir:VCC", "red", [ "v0" ] ],
-        [ "uno:GND.1", "pir:GND", "black", [ "v0" ] ],
-        [ "uno:3", "pir:OUT", "green", [ "v0" ] ],
-        [ "uno:3.3V", "esp01:3V3", "red", [ "v0" ] ],
-        [ "uno:3.3V", "esp01:EN", "red", [ "v0" ] ],
-        [ "uno:GND.2", "esp01:GND", "black", [ "v0" ] ],
-        [ "esp01:TX", "uno:10", "green", [ "v0" ] ],
-        [ "uno:11", "esp01:RX", "orange", [ "v0" ] ]
-      ]
-    }, null, 2);
-  } else {
-    diagramData = JSON.stringify({
-      version: 1,
-      author: "Matheus Snake Eco",
-      editor: "wokwi",
-      parts: [
-        { type: "board-esp32-devkit-c-v4", id: "esp", top: 0, left: 0, attrs: {} },
-        { type: "board-ssd1306", id: "oled", top: -120, left: 80, attrs: { i2cAddress: "0x3c" } },
-        { type: "wokwi-relay-module", id: "relay", top: 120, left: 180, attrs: {} }
-      ],
-      connections: [
-        [ "esp:3V3", "oled:VCC", "red", [ "v0" ] ],
-        [ "esp:GND.1", "oled:GND", "black", [ "v0" ] ],
-        [ "esp:22", "oled:SCL", "purple", [ "v0" ] ],
-        [ "esp:21", "oled:SDA", "blue", [ "v0" ] ],
-        [ "esp:5V", "relay:VCC", "red", [ "v0" ] ],
-        [ "esp:GND.2", "relay:GND", "black", [ "v0" ] ],
-        [ "esp:15", "relay:IN", "yellow", [ "v0" ] ]
-      ]
-    }, null, 2);
-  }
+  generateLiveWokwiState();
+  const diagramData = JSON.stringify(liveWokwiDiagram, null, 2);
   navigator.clipboard.writeText(diagramData).then(() => {
-    showToast('diagram.json copiado!');
+    showToast('diagram.json dinâmico sincronizado com o Wokwi copiado!');
   }).catch(() => {
-    showToast('Copie o código do arquivo diagram.json.');
+    showToast('Copie o código do painel diagram.json.');
   });
 }
 
 function copyCurrentFirmwareCode() {
+  generateFirmwareCode();
+  generateLiveWokwiState();
   const codeEl = document.getElementById('code-output');
   if (!codeEl) return;
   navigator.clipboard.writeText(codeEl.value).then(() => {
-    showToast('sketch.ino copiado!');
+    showToast('sketch.ino sincronizado com o Wokwi copiado!');
   });
 }
 
@@ -810,6 +770,7 @@ function onMcuChange(mcuId) {
   rebuild3dScene();
   updatePhysicalWiringGuide();
   generateFirmwareCode();
+  generateLiveWokwiState();
   logTestEvent(`Placa alterada para: ${mcu.name}`);
   savePersistentState();
   showToast(`Microcontrolador: ${mcu.name}`);
@@ -1125,12 +1086,47 @@ function focusCameraOnStep() {
 // Maps every pin name of the ESP32 and Modules to its exact 3D vector
 function getEspPhysicalPinCoord(pinName) {
   const mcu = MCUS[currentMcuId];
+
+  // Specific physical pinout for Arduino Uno R3
+  if (currentMcuId === 'arduino_uno') {
+    let clean = pinName.replace('Arduino:', '').replace('Pino', '').trim();
+    if (clean === '10') clean = 'D10';
+    if (clean === '11') clean = 'D11';
+    if (clean === '2') clean = 'D2';
+    if (clean === '3') clean = 'D3';
+    if (clean === '4') clean = 'D4';
+    if (clean === '5') clean = 'D5';
+    if (clean === '7') clean = 'D7';
+    if (clean === '13') clean = 'D13';
+
+    // Top Digital Header (Z = -2.65)
+    for (let i = 0; i < mcu.rightPins.length; i++) {
+      const p = mcu.rightPins[i];
+      if (p.includes(clean) || clean.includes(p) || (p.startsWith('D') && clean.startsWith('D') && p.slice(1,3) === clean.slice(1,3))) {
+        const x = -5.8 + (i * 0.38);
+        return new THREE.Vector3(x, 2.58, -2.65);
+      }
+    }
+
+    // Bottom Power & Analog Header (Z = +2.65)
+    for (let i = 0; i < mcu.leftPins.length; i++) {
+      const p = mcu.leftPins[i];
+      if (p === clean || (p.startsWith('5V') && clean.includes('5V')) || (p.startsWith('3.3V') && clean.includes('3.3V')) || (p === 'GND' && clean.includes('GND'))) {
+        const x = -5.8 + (i * 0.38);
+        return new THREE.Vector3(x, 2.58, 2.65);
+      }
+    }
+
+    return new THREE.Vector3(-4.0, 2.58, -2.65);
+  }
+
+  // ESP32 and other MCUs
   const pinsPerRow = Math.floor(mcu.pinsCount / 2);
   const pinSpacing = 6.8 / (pinsPerRow - 1);
   const xStart = -6.7;
 
   // Clean pin name (e.g. 'GPIO 23', 'D23' -> 'D23')
-  let clean = pinName.replace('GPIO', 'D').replace(' ', '').trim();
+  let clean = pinName.replace('GPIO', 'D').replace('ESP32:', '').replace('Pino', '').replace(' ', '').trim();
   if (clean === '23') clean = 'D23';
   if (clean === '22') clean = 'D22';
   if (clean === '21') clean = 'D21';
@@ -1195,6 +1191,24 @@ function getModulePhysicalPinCoord(modId, modPin, modXOffset) {
     if (modPin === 'TRIG') return new THREE.Vector3(modXOffset - 0.25, 2.2, -0.9);
     if (modPin === 'ECHO') return new THREE.Vector3(modXOffset + 0.25, 2.2, -0.9);
     if (modPin === 'GND') return new THREE.Vector3(modXOffset + 0.75, 2.2, -0.9);
+  } else if (modId === 'esp01_modem') {
+    // ESP-01 8-pin module coordinates
+    if (modPin === 'GND') return new THREE.Vector3(modXOffset - 1.15, 2.6, -0.45);
+    if (modPin === 'TX') return new THREE.Vector3(modXOffset - 0.65, 2.6, -0.45);
+    if (modPin === 'RX') return new THREE.Vector3(modXOffset - 1.15, 2.6, 0.45);
+    if (modPin === '3V3' || modPin === 'VCC') return new THREE.Vector3(modXOffset - 0.65, 2.6, 0.45);
+    if (modPin === 'CH_PD') return new THREE.Vector3(modXOffset - 0.65, 2.6, -0.15);
+    return new THREE.Vector3(modXOffset - 0.9, 2.6, 0.0);
+  } else if (modId === 'rf433_tx') {
+    // RF Transmitter 3 pins
+    if (modPin === 'VCC') return new THREE.Vector3(modXOffset - 0.6, 2.3, 0.8);
+    if (modPin === 'DATA') return new THREE.Vector3(modXOffset, 2.3, 0.8);
+    if (modPin === 'GND') return new THREE.Vector3(modXOffset + 0.6, 2.3, 0.8);
+  } else if (modId === 'pir_hc_sr501') {
+    // PIR Sensor 3 pins
+    if (modPin === 'VCC') return new THREE.Vector3(modXOffset - 1.2, 2.3, -0.5);
+    if (modPin === 'OUT') return new THREE.Vector3(modXOffset - 1.2, 2.3, 0.0);
+    if (modPin === 'GND') return new THREE.Vector3(modXOffset - 1.2, 2.3, 0.5);
   }
 
   // Fallback for custom modules
@@ -1227,6 +1241,225 @@ function createPinTextSprite(text, colorHex) {
   const sprite = new THREE.Sprite(spriteMat);
   sprite.scale.set(1.4, 0.7, 1);
   return sprite;
+}
+
+// --- TEXTURE GENERATORS ---
+function generateBreadboardTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 2048;
+  canvas.height = 1024;
+  const ctx = canvas.getContext('2d');
+
+  // Fundo off-white da carcaça plástica de ABS
+  ctx.fillStyle = '#f8fafc';
+  ctx.fillRect(0, 0, 2048, 1024);
+
+  // Borda chanfrada externa suave
+  ctx.strokeStyle = '#e2e8f0';
+  ctx.lineWidth = 12;
+  ctx.strokeRect(16, 16, 2016, 992);
+
+  // Linhas de barramento superior (Alimentação + e -)
+  ctx.strokeStyle = '#ef4444'; // Vermelho +
+  ctx.lineWidth = 8;
+  ctx.beginPath();
+  ctx.moveTo(80, 110);
+  ctx.lineTo(1968, 110);
+  ctx.stroke();
+
+  ctx.strokeStyle = '#0284c7'; // Azul -
+  ctx.lineWidth = 8;
+  ctx.beginPath();
+  ctx.moveTo(80, 175);
+  ctx.lineTo(1968, 175);
+  ctx.stroke();
+
+  // Linhas de barramento inferior (Alimentação - e +)
+  ctx.strokeStyle = '#0284c7'; // Azul -
+  ctx.lineWidth = 8;
+  ctx.beginPath();
+  ctx.moveTo(80, 849);
+  ctx.lineTo(1968, 849);
+  ctx.stroke();
+
+  ctx.strokeStyle = '#ef4444'; // Vermelho +
+  ctx.lineWidth = 8;
+  ctx.beginPath();
+  ctx.moveTo(80, 914);
+  ctx.lineTo(1968, 914);
+  ctx.stroke();
+
+  // Símbolos + e - nas pontas
+  ctx.font = 'bold 32px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#ef4444';
+  ctx.fillText('+', 50, 120);
+  ctx.fillText('+', 1998, 120);
+  ctx.fillText('+', 50, 924);
+  ctx.fillText('+', 1998, 924);
+
+  ctx.fillStyle = '#0284c7';
+  ctx.fillText('-', 50, 185);
+  ctx.fillText('-', 1998, 185);
+  ctx.fillText('-', 50, 859);
+  ctx.fillText('-', 1998, 859);
+
+  // Canaleta central de isolamento de CIs (sulco escuro)
+  ctx.fillStyle = '#cbd5e1';
+  ctx.fillRect(40, 500, 1968, 24);
+  ctx.fillStyle = '#94a3b8';
+  ctx.fillRect(40, 508, 1968, 8);
+
+  const cols = 63;
+  const xStart = 90;
+  const xStep = (1960 - 90) / (cols - 1);
+
+  // Furos de alimentação superior e inferior
+  for (let c = 0; c < cols; c++) {
+    const x = xStart + (c * xStep);
+    drawBreadboardHole(ctx, x, 75);
+    drawBreadboardHole(ctx, x, 142);
+    drawBreadboardHole(ctx, x, 882);
+    drawBreadboardHole(ctx, x, 949);
+  }
+
+  // Furos da matriz principal (linhas A-E em cima, F-J embaixo)
+  for (let c = 0; c < cols; c++) {
+    const x = xStart + (c * xStep);
+
+    // Números das colunas a cada 5
+    if ((c + 1) % 5 === 0 || c === 0) {
+      ctx.font = 'bold 18px monospace';
+      ctx.fillStyle = '#475569';
+      ctx.fillText(String(c + 1), x, 225);
+      ctx.fillText(String(c + 1), x, 490);
+      ctx.fillText(String(c + 1), x, 545);
+      ctx.fillText(String(c + 1), x, 810);
+    }
+
+    // Linhas A-E (y = 260 a 440)
+    for (let r = 0; r < 5; r++) {
+      const y = 260 + (r * 45);
+      drawBreadboardHole(ctx, x, y);
+    }
+
+    // Linhas F-J (y = 580 a 760)
+    for (let r = 0; r < 5; r++) {
+      const y = 580 + (r * 45);
+      drawBreadboardHole(ctx, x, y);
+    }
+  }
+
+  const lettersTop = ['A', 'B', 'C', 'D', 'E'];
+  const lettersBot = ['F', 'G', 'H', 'I', 'J'];
+  ctx.font = 'bold 20px monospace';
+  ctx.fillStyle = '#64748b';
+  lettersTop.forEach((letra, r) => {
+    const y = 267 + (r * 45);
+    ctx.fillText(letra, 60, y);
+    ctx.fillText(letra, 1988, y);
+  });
+  lettersBot.forEach((letra, r) => {
+    const y = 587 + (r * 45);
+    ctx.fillText(letra, 60, y);
+    ctx.fillText(letra, 1988, y);
+  });
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.anisotropy = 16;
+  return texture;
+}
+
+function drawBreadboardHole(ctx, x, y) {
+  ctx.fillStyle = '#e2e8f0';
+  ctx.fillRect(x - 9, y - 9, 18, 18);
+  ctx.fillStyle = '#94a3b8';
+  ctx.fillRect(x - 7, y - 7, 14, 14);
+  ctx.fillStyle = '#475569';
+  ctx.fillRect(x - 5, y - 5, 10, 10);
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(x - 3, y - 3, 6, 6);
+}
+
+function generateArduinoUnoSilkscreenTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 768;
+  const ctx = canvas.getContext('2d');
+
+  // Cor oficial azul-petróleo Arduino Uno
+  ctx.fillStyle = '#00878F';
+  ctx.fillRect(0, 0, 1024, 768);
+
+  ctx.fillStyle = 'rgba(0,0,0,0.06)';
+  for (let i = 0; i < 768; i += 4) {
+    ctx.fillRect(0, i, 1024, 2);
+  }
+
+  // Furos de fixação com anéis estanhados
+  ctx.strokeStyle = '#d4af37';
+  ctx.lineWidth = 4;
+  [ [60, 60], [964, 60], [60, 708], [964, 708] ].forEach(([x, y]) => {
+    ctx.beginPath(); ctx.arc(x, y, 22, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = '#0f172a';
+    ctx.beginPath(); ctx.arc(x, y, 14, 0, Math.PI * 2); ctx.fill();
+  });
+
+  // Logotipo oficial Arduino (Infinito)
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 14;
+  ctx.beginPath();
+  ctx.arc(430, 360, 42, Math.PI * 0.25, Math.PI * 1.75);
+  ctx.arc(530, 360, 42, Math.PI * 1.25, Math.PI * 0.75);
+  ctx.stroke();
+
+  // Textos em Serigrafia branca nítida
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'center';
+  ctx.font = 'bold 38px sans-serif';
+  ctx.fillText('ARDUINO', 480, 280);
+  ctx.font = 'bold 54px sans-serif';
+  ctx.fillText('UNO', 480, 470);
+  ctx.font = '16px monospace';
+  ctx.fillText('SMART NODE HUB • ATMEGA328P', 480, 520);
+  ctx.fillText('MADE IN ITALY', 480, 550);
+
+  // Serigrafia dos Pinos Digitais Superiores
+  ctx.textAlign = 'center';
+  ctx.font = 'bold 15px monospace';
+  const digitalPins = ['SCL', 'SDA', 'AREF', 'GND', '13', '12', '~11', '~10', '~9', '8', '7', '~6', '~5', '4', '~3', '2', 'TX>1', 'RX<0'];
+  const xDigStart = 160;
+  const xDigStep = 780 / (digitalPins.length - 1);
+  digitalPins.forEach((pin, i) => {
+    ctx.fillText(pin, xDigStart + (i * xDigStep), 45);
+  });
+
+  // Serigrafia dos Pinos de Alimentação e Analógicos Inferiores
+  const powerPins = ['IOREF', 'RESET', '3.3V', '5V', 'GND', 'GND', 'VIN'];
+  const xPwrStart = 180;
+  const xPwrStep = 240 / (powerPins.length - 1);
+  powerPins.forEach((pin, i) => {
+    ctx.fillText(pin, xPwrStart + (i * xPwrStep), 735);
+  });
+  ctx.fillText('POWER', 300, 700);
+
+  const analogPins = ['A0', 'A1', 'A2', 'A3', 'A4', 'A5'];
+  const xAnaStart = 560;
+  const xAnaStep = 220 / (analogPins.length - 1);
+  analogPins.forEach((pin, i) => {
+    ctx.fillText(pin, xAnaStart + (i * xAnaStep), 735);
+  });
+  ctx.fillText('ANALOG IN', 670, 700);
+
+  ctx.font = 'bold 14px monospace';
+  ctx.fillText('ON', 330, 220);
+  ctx.fillText('L', 420, 220);
+  ctx.fillText('TX', 420, 160);
+  ctx.fillText('RX', 420, 185);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.anisotropy = 16;
+  return texture;
 }
 
 // --- TEXTURE GENERATORS ---
@@ -1506,45 +1739,196 @@ function rebuild3dScene() {
 }
 
 function createBreadboard3D(group) {
-  const bbWidth = 24;
-  const bbHeight = 1.3;
-  const bbDepth = 8.5;
+  const bbWidth = 24.0;
+  const bbHeight = 1.35;
+  const bbDepth = 8.6;
+
+  // Corpo principal com textura fotorrealista da protoboard
+  const bbTex = generateBreadboardTexture();
+  const bbMatTop = new THREE.MeshStandardMaterial({ map: bbTex, roughness: 0.45, metalness: 0.05 });
+  const bbMatSide = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.6, metalness: 0.02 });
+
+  // Materiais das 6 faces (topo recebe a serigrafia completa de 830 furos)
+  const materials = [
+    bbMatSide, // right
+    bbMatSide, // left
+    bbMatTop,  // top (com serigrafia dos furos e barramentos)
+    bbMatSide, // bottom
+    bbMatSide, // front
+    bbMatSide  // back
+  ];
 
   const bodyGeo = new THREE.BoxGeometry(bbWidth, bbHeight, bbDepth);
-  const bodyMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.55, metalness: 0.05 });
-  const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+  const bodyMesh = new THREE.Mesh(bodyGeo, materials);
   bodyMesh.position.set(0, bbHeight / 2, 0);
   bodyMesh.receiveShadow = true;
   bodyMesh.castShadow = true;
   group.add(bodyMesh);
 
-  const notchGeo = new THREE.BoxGeometry(bbWidth - 0.6, 0.45, 0.9);
-  const notchMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.8 });
+  // Canaleta central divisória física
+  const notchGeo = new THREE.BoxGeometry(bbWidth - 0.4, 0.4, 0.85);
+  const notchMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.85 });
   const notchMesh = new THREE.Mesh(notchGeo, notchMat);
   notchMesh.position.set(0, bbHeight, 0);
   group.add(notchMesh);
 
-  const lineGeo = new THREE.BoxGeometry(bbWidth - 1, 0.02, 0.15);
-  const redMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
-  const blueMat = new THREE.MeshBasicMaterial({ color: 0x3b82f6 });
-
-  const topRed = new THREE.Mesh(lineGeo, redMat);
-  topRed.position.set(0, bbHeight + 0.01, 3.6);
-  group.add(topRed);
-  const topBlue = new THREE.Mesh(lineGeo, blueMat);
-  topBlue.position.set(0, bbHeight + 0.01, 3.2);
-  group.add(topBlue);
-
-  const botBlue = new THREE.Mesh(lineGeo, blueMat);
-  botBlue.position.set(0, bbHeight + 0.01, -3.2);
-  group.add(botBlue);
-  const botRed = new THREE.Mesh(lineGeo, redMat);
-  botRed.position.set(0, bbHeight + 0.01, -3.6);
-  group.add(botRed);
+  // Travas laterais de encaixe modular entre protoboards
+  const tabGeo = new THREE.BoxGeometry(0.35, 0.6, 1.2);
+  const tabMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.5 });
+  [-2.2, 2.2].forEach(z => {
+    const tabR = new THREE.Mesh(tabGeo, tabMat);
+    tabR.position.set(bbWidth / 2 + 0.17, bbHeight / 2, z);
+    group.add(tabR);
+  });
 }
 
 function createMcu3D(group, mcuId) {
   const mcu = MCUS[mcuId];
+  if (mcuId === 'arduino_uno') {
+    createArduinoUno3D(group);
+  } else {
+    createEsp32DevKit3D(group, mcu);
+  }
+}
+
+function createArduinoUno3D(group) {
+  const pcbLength = 8.8;
+  const pcbWidth = 6.4;
+  const pcbThickness = 0.22;
+
+  // PCB azul oficial do Arduino Uno R3 com textura detalhada
+  const unoTex = generateArduinoUnoSilkscreenTexture();
+  const pcbMat = new THREE.MeshStandardMaterial({ map: unoTex, roughness: 0.35, metalness: 0.15 });
+  const pcbMesh = new THREE.Mesh(new THREE.BoxGeometry(pcbLength, pcbThickness, pcbWidth), pcbMat);
+  pcbMesh.position.set(-3.5, 1.9, 0);
+  pcbMesh.castShadow = true;
+  pcbMesh.receiveShadow = true;
+  group.add(pcbMesh);
+
+  // Conector USB Tipo B prateado metálico (relevo fiel de metal estampado)
+  const usbMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.95, roughness: 0.12 });
+  const usbBody = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1.15, 1.25), usbMat);
+  usbBody.position.set(-7.15, 2.45, -1.6);
+  usbBody.castShadow = true;
+  group.add(usbBody);
+
+  // Fenda interna do conector USB com língua de plástico
+  const usbHole = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.7, 0.8), new THREE.MeshStandardMaterial({ color: 0x020617 }));
+  usbHole.position.set(-7.85, 2.45, -1.6);
+  group.add(usbHole);
+  const usbTongue = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.16, 0.6), new THREE.MeshStandardMaterial({ color: 0xf8fafc }));
+  usbTongue.position.set(-7.82, 2.35, -1.6);
+  group.add(usbTongue);
+
+  // Conector Jack DC P4 de alimentação externa (cilíndrico preto com pino metálico)
+  const jackMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.6 });
+  const jackMesh = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.1, 1.3), jackMat);
+  jackMesh.position.set(-7.1, 2.45, 1.7);
+  jackMesh.castShadow = true;
+  group.add(jackMesh);
+  const jackBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.48, 0.48, 0.4, 16), jackMat);
+  jackBarrel.rotation.z = Math.PI / 2;
+  jackBarrel.position.set(-7.95, 2.45, 1.7);
+  group.add(jackBarrel);
+  const jackPin = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.35, 8), new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.9 }));
+  jackPin.rotation.z = Math.PI / 2;
+  jackPin.position.set(-7.95, 2.45, 1.7);
+  group.add(jackPin);
+
+  // Soquete DIP de 28 pinos com chip ATmega328P
+  const socketMat = new THREE.MeshStandardMaterial({ color: 0x020617, roughness: 0.8 });
+  const socketMesh = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.28, 1.05), socketMat);
+  socketMesh.position.set(-2.2, 2.1, 0.6);
+  socketMesh.castShadow = true;
+  group.add(socketMesh);
+
+  // Corpo do microcontrolador ATmega328P com gravação e chanfro
+  const chipMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.35 });
+  const chipMesh = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.25, 0.95), chipMat);
+  chipMesh.position.set(-2.2, 2.32, 0.6);
+  chipMesh.castShadow = true;
+  group.add(chipMesh);
+
+  // Cristal de quartzo 16.000 MHz metálico elíptico
+  const xtalMat = new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.95, roughness: 0.15 });
+  const xtal = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.35, 0.45), xtalMat);
+  xtal.position.set(-4.5, 2.15, -0.2);
+  group.add(xtal);
+
+  // Botão Reset tátil (corpo metálico prateado + botãozinho vermelho)
+  const btnBase = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.35, 0.7), new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.9 }));
+  btnBase.position.set(-6.8, 2.15, -2.5);
+  group.add(btnBase);
+  const btnRed = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.25, 12), new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.3 }));
+  btnRed.position.set(-6.8, 2.38, -2.5);
+  group.add(btnRed);
+
+  // LEDs SMD de Status (ON, L, TX, RX)
+  const onLedMat = new THREE.MeshStandardMaterial({
+    color: virtualPower ? 0x22c55e : 0x052e16,
+    emissive: virtualPower ? 0x22c55e : 0x000000,
+    emissiveIntensity: virtualPower ? 2.5 : 0
+  });
+  const onLed = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.12, 0.2), onLedMat);
+  onLed.position.set(-4.8, 2.1, -1.2);
+  group.add(onLed);
+
+  const lLedMat = new THREE.MeshStandardMaterial({
+    color: (virtualPower && virtualLedState) ? 0xf59e0b : 0x451a03,
+    emissive: (virtualPower && virtualLedState) ? 0xf59e0b : 0x000000,
+    emissiveIntensity: (virtualPower && virtualLedState) ? 2.8 : 0
+  });
+  const lLed = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.12, 0.2), lLedMat);
+  lLed.position.set(-3.6, 2.1, -1.2);
+  group.add(lLed);
+
+  // Barras de Conectores Fêmeas Pretos (Headers com furos metálicos)
+  // 1. Barra Superior (Pinos Digitais: D0-D13, GND, AREF, SDA, SCL)
+  const headerMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.65 });
+  const topHeader1 = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.7, 0.38), headerMat);
+  topHeader1.position.set(-1.4, 2.28, -2.65);
+  group.add(topHeader1);
+  const topHeader2 = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.7, 0.38), headerMat);
+  topHeader2.position.set(-4.5, 2.28, -2.65);
+  group.add(topHeader2);
+
+  // 2. Barra Inferior (Power & Analog)
+  const botHeaderPwr = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.7, 0.38), headerMat);
+  botHeaderPwr.position.set(-5.1, 2.28, 2.65);
+  group.add(botHeaderPwr);
+  const botHeaderAna = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.7, 0.38), headerMat);
+  botHeaderAna.position.set(-1.8, 2.28, 2.65);
+  group.add(botHeaderAna);
+
+  // Pinos Interativos Fêmeas nos Headers
+  const uno = MCUS.arduino_uno;
+  const pinGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.4, 8);
+  const pinMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8, roughness: 0.3 });
+
+  // Pinos Superiores (D0 a D13, etc.)
+  const topPins = uno.rightPins;
+  topPins.forEach((pName, i) => {
+    const x = -5.8 + (i * 0.38);
+    const pin = new THREE.Mesh(pinGeo, pinMat.clone());
+    pin.position.set(x, 2.55, -2.65);
+    pin.userData = { isPin: true, mcuPin: true, name: pName, side: 'top', index: i };
+    group.add(pin);
+    interactivePins.push(pin);
+  });
+
+  // Pinos Inferiores (Power e Analog In)
+  const botPins = uno.leftPins;
+  botPins.forEach((pName, i) => {
+    const x = -5.8 + (i * 0.38);
+    const pin = new THREE.Mesh(pinGeo, pinMat.clone());
+    pin.position.set(x, 2.55, 2.65);
+    pin.userData = { isPin: true, mcuPin: true, name: pName, side: 'bottom', index: i };
+    group.add(pin);
+    interactivePins.push(pin);
+  });
+}
+
+function createEsp32DevKit3D(group, mcu) {
   const pcbLength = 8.0;
   const pcbWidth = 3.8;
   const pcbThickness = 0.24;
@@ -1557,6 +1941,7 @@ function createMcu3D(group, mcuId) {
   pcbMesh.receiveShadow = true;
   group.add(pcbMesh);
 
+  // Blindagem metálica de aço escovado do ESP-WROOM-32
   const shieldTex = generateShieldLaserTexture();
   const shieldGeo = new THREE.BoxGeometry(2.8, 0.42, 2.5);
   const shieldMat = new THREE.MeshStandardMaterial({ map: shieldTex, metalness: 0.92, roughness: 0.22 });
@@ -1565,10 +1950,38 @@ function createMcu3D(group, mcuId) {
   shieldMesh.castShadow = true;
   group.add(shieldMesh);
 
+  // Conector Micro-USB prateado reforçado
   const usbMesh = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.45, 1.1), new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.95, roughness: 0.1 }));
   usbMesh.position.set(-7.1, 2.05, 0);
   group.add(usbMesh);
 
+  // Botões táteis SMD (EN e BOOT)
+  const btnGeo = new THREE.BoxGeometry(0.4, 0.25, 0.4);
+  const btnMat = new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.9 });
+  const btnActuator = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.15, 8), new THREE.MeshStandardMaterial({ color: 0x0f172a }));
+
+  const enBtn = new THREE.Mesh(btnGeo, btnMat);
+  enBtn.position.set(-6.3, 2.1, -1.2);
+  group.add(enBtn);
+
+  const bootBtn = new THREE.Mesh(btnGeo, btnMat);
+  bootBtn.position.set(-6.3, 2.1, 1.2);
+  group.add(bootBtn);
+
+  // Chip CP2102 (conversor USB-Serial)
+  const cp2102 = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.15, 0.7), new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4 }));
+  cp2102.position.set(-5.0, 2.1, 0);
+  group.add(cp2102);
+
+  // Regulador AMS1117 3.3V com dissipador metálico
+  const regBody = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.2, 0.5), new THREE.MeshStandardMaterial({ color: 0x1e293b }));
+  regBody.position.set(-3.8, 2.1, -1.2);
+  group.add(regBody);
+  const regTab = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.08, 0.3), new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.95 }));
+  regTab.position.set(-4.2, 2.1, -1.2);
+  group.add(regTab);
+
+  // LEDs SMD de Power e GPIO 2
   const pwrLedMat = new THREE.MeshStandardMaterial({
     color: virtualPower ? 0xef4444 : 0x450a0a,
     emissive: virtualPower ? 0xef4444 : 0x000000,
@@ -1869,7 +2282,7 @@ function createGenericModule3D(group, modId) {
   group.add(pcb);
 }
 
-// 1:1 PHYSICAL WIRES ENGINE WITH 3D PIN LABELS
+// 1:1 PHYSICAL WIRES ENGINE WITH CATENARY GRAVITY PHYSICS & REALISTIC DUPONT TERMINALS
 function createWires3D(wireGroup, labelGroup) {
   if (attachedModules.length === 0) return;
 
@@ -1896,45 +2309,71 @@ function createWires3D(wireGroup, labelGroup) {
       const pStart = getEspPhysicalPinCoord(espPin);
       const pEnd = getModulePhysicalPinCoord(modId, modPin, modXOffset);
 
-      // DuPont Sleeves
-      const dupontGeo = new THREE.BoxGeometry(0.24, 0.55, 0.24);
-      const dupontMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.5 });
+      // Fotorrealismo: Conector DuPont Preto de Encaixe com Relevo
+      const dupontBodyGeo = new THREE.BoxGeometry(0.26, 0.62, 0.26);
+      const dupontMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.55, metalness: 0.1 });
+      const pinTipMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.95, roughness: 0.15 });
 
-      const d1 = new THREE.Mesh(dupontGeo, dupontMat);
-      d1.position.set(pStart.x, pStart.y + 0.1, pStart.z);
-      wireGroup.add(d1);
+      // Conector DuPont 1 (Ponta na Placa/MCU)
+      const d1Group = new THREE.Group();
+      d1Group.position.set(pStart.x, pStart.y + 0.32, pStart.z);
+      const d1Body = new THREE.Mesh(dupontBodyGeo, dupontMat);
+      d1Body.castShadow = true;
+      d1Group.add(d1Body);
+      // Travinha lateral de engate rápido da capa DuPont
+      const d1Clip = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.25, 0.08), new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.8 }));
+      d1Clip.position.set(0, 0, 0.12);
+      d1Group.add(d1Clip);
+      wireGroup.add(d1Group);
 
-      const d2 = new THREE.Mesh(dupontGeo, dupontMat);
-      d2.position.set(pEnd.x, pEnd.y + 0.1, pEnd.z);
-      wireGroup.add(d2);
+      // Conector DuPont 2 (Ponta no Módulo/Sensor)
+      const d2Group = new THREE.Group();
+      d2Group.position.set(pEnd.x, pEnd.y + 0.32, pEnd.z);
+      const d2Body = new THREE.Mesh(dupontBodyGeo, dupontMat);
+      d2Body.castShadow = true;
+      d2Group.add(d2Body);
+      const d2Clip = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.25, 0.08), new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.8 }));
+      d2Clip.position.set(0, 0, 0.12);
+      d2Group.add(d2Clip);
+      wireGroup.add(d2Group);
 
-      // Catenary sag / Bézier curve between exact pins
+      // Física de Catenária Real (Curvatura de Gravidade e Flexão Natural de Fio de Cobre)
+      const dist = pStart.distanceTo(pEnd);
       const midX = (pStart.x + pEnd.x) / 2;
-      const archHeight = Math.max(pStart.y, pEnd.y) + 2.4 + (pinIndex * 0.4);
-      const midZ = (pStart.z + pEnd.z) / 2 + 1.0;
+      const midZ = (pStart.z + pEnd.z) / 2 + (Math.sin(pinIndex * 1.2) * 0.4);
 
-      const curve = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(pStart.x, pStart.y + 0.35, pStart.z),
-        new THREE.Vector3(pStart.x, pStart.y + 1.0, pStart.z),
-        new THREE.Vector3(midX, archHeight, midZ),
-        new THREE.Vector3(pEnd.x, pEnd.y + 1.0, pEnd.z),
-        new THREE.Vector3(pEnd.x, pEnd.y + 0.35, pEnd.z)
-      ]);
+      // O fio sobe suavemente da ponta do pino, relaxa em arco elástico e desce naturalmente
+      const archHeight = Math.max(pStart.y, pEnd.y) + 0.9 + (Math.min(dist * 0.22, 1.8)) + (pinIndex * 0.18);
+      const sagY = Math.max(pStart.y, pEnd.y) + 0.5 + (pinIndex * 0.12);
 
-      const tubeGeo = new THREE.TubeGeometry(curve, 36, 0.08, 10, false);
+      const p1 = new THREE.Vector3(pStart.x, pStart.y + 0.65, pStart.z);
+      const p2 = new THREE.Vector3(pStart.x + ((midX - pStart.x) * 0.25), archHeight * 0.92, pStart.z + ((midZ - pStart.z) * 0.25));
+      const pMid = new THREE.Vector3(midX, archHeight, midZ);
+      const p3 = new THREE.Vector3(pEnd.x + ((midX - pEnd.x) * 0.25), archHeight * 0.92, pEnd.z + ((midZ - pEnd.z) * 0.25));
+      const p4 = new THREE.Vector3(pEnd.x, pEnd.y + 0.65, pEnd.z);
+
+      const curve = new THREE.CatmullRomCurve3([p1, p2, pMid, p3, p4], false, 'chordal', 0.4);
+
+      // Tubo do cabo com acabamento realista acetinado de PVC
+      const tubeGeo = new THREE.TubeGeometry(curve, 44, 0.075, 12, false);
       const wireColorHex = mod.wireColors && mod.wireColors[modPin] ? parseInt(mod.wireColors[modPin].replace('#', '0x')) : 0xeab308;
-      const tubeMat = new THREE.MeshStandardMaterial({ color: wireColorHex, roughness: 0.25, metalness: 0.08 });
+      const tubeMat = new THREE.MeshStandardMaterial({
+        color: wireColorHex,
+        roughness: 0.28,
+        metalness: 0.06
+      });
       const wireMesh = new THREE.Mesh(tubeGeo, tubeMat);
       wireMesh.castShadow = true;
+      wireMesh.receiveShadow = true;
       wireGroup.add(wireMesh);
 
-      // Floating 3D Billboards right above the pins
+      // Etiquetas 3D Flutuantes indicando exatamente cada pino
       const espLabel = createPinTextSprite(espPin, (mod.wireColors && mod.wireColors[modPin]) || '#06b6d4');
-      espLabel.position.set(pStart.x, pStart.y + 1.2, pStart.z);
+      espLabel.position.set(pStart.x, pStart.y + 1.25, pStart.z);
       labelGroup.add(espLabel);
 
       const modLabel = createPinTextSprite(modPin, (mod.wireColors && mod.wireColors[modPin]) || '#06b6d4');
-      modLabel.position.set(pEnd.x, pEnd.y + 1.1, pEnd.z);
+      modLabel.position.set(pEnd.x, pEnd.y + 1.25, pEnd.z);
       labelGroup.add(modLabel);
     });
 
@@ -2508,4 +2947,243 @@ function showToast(msg) {
   setTimeout(() => {
     toast.classList.add('translate-y-20', 'opacity-0');
   }, 3200);
+}
+
+// --- LIVE WOKWI SYNCHRONIZATION ENGINE ---
+let liveWokwiDiagram = null;
+
+function generateLiveWokwiState() {
+  const isArduino = currentMcuId === 'arduino_uno';
+  const parts = [];
+  const connections = [];
+
+  if (isArduino) {
+    parts.push({ type: "wokwi-arduino-uno", id: "uno", top: 80, left: 60, attrs: {} });
+  } else {
+    parts.push({ type: "board-esp32-devkit-c-v4", id: "esp", top: 80, left: 60, attrs: {} });
+  }
+
+  const mcuPrefix = isArduino ? "uno" : "esp";
+  let curLeft = 380;
+  let curTop = -80;
+
+  attachedModules.forEach((modId, idx) => {
+    if (modId === 'rele_1ch') {
+      const partId = `relay${idx + 1}`;
+      parts.push({ type: "wokwi-relay-module", id: partId, top: curTop + 140, left: curLeft, attrs: {} });
+      if (isArduino) {
+        connections.push([ `${mcuPrefix}:5V`, `${partId}:VCC`, "red", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:GND.1`, `${partId}:GND`, "black", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:7`, `${partId}:IN`, "yellow", ["v0"] ]);
+      } else {
+        connections.push([ `${mcuPrefix}:5V`, `${partId}:VCC`, "red", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:GND.1`, `${partId}:GND`, "black", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:15`, `${partId}:IN`, "yellow", ["v0"] ]);
+      }
+      curLeft += 220;
+    } else if (modId === 'dht22') {
+      const partId = `dht${idx + 1}`;
+      parts.push({ type: "wokwi-dht22", id: partId, top: curTop, left: curLeft, attrs: { temperature: String(virtualDhtTemp), humidity: String(virtualDhtHum) } });
+      if (isArduino) {
+        connections.push([ `${mcuPrefix}:5V`, `${partId}:VCC`, "red", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:GND.1`, `${partId}:GND`, "black", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:2`, `${partId}:SDA`, "blue", ["v0"] ]);
+      } else {
+        connections.push([ `${mcuPrefix}:3V3`, `${partId}:VCC`, "red", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:GND.1`, `${partId}:GND`, "black", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:4`, `${partId}:SDA`, "blue", ["v0"] ]);
+      }
+      curLeft += 200;
+    } else if (modId === 'oled_i2c') {
+      const partId = `oled${idx + 1}`;
+      parts.push({ type: "board-ssd1306", id: partId, top: curTop, left: curLeft, attrs: { i2cAddress: "0x3c" } });
+      if (isArduino) {
+        connections.push([ `${mcuPrefix}:5V`, `${partId}:VCC`, "red", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:GND.1`, `${partId}:GND`, "black", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:A5`, `${partId}:SCL`, "purple", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:A4`, `${partId}:SDA`, "blue", ["v0"] ]);
+      } else {
+        connections.push([ `${mcuPrefix}:3V3`, `${partId}:VCC`, "red", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:GND.1`, `${partId}:GND`, "black", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:22`, `${partId}:SCL`, "purple", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:21`, `${partId}:SDA`, "blue", ["v0"] ]);
+      }
+      curLeft += 220;
+    } else if (modId === 'hc_sr04') {
+      const partId = `ultrasonic${idx + 1}`;
+      parts.push({ type: "wokwi-hc-sr04", id: partId, top: curTop + 140, left: curLeft, attrs: {} });
+      if (isArduino) {
+        connections.push([ `${mcuPrefix}:5V`, `${partId}:VCC`, "red", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:GND.1`, `${partId}:GND`, "black", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:8`, `${partId}:TRIG`, "green", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:9`, `${partId}:ECHO`, "orange", ["v0"] ]);
+      } else {
+        connections.push([ `${mcuPrefix}:5V`, `${partId}:VCC`, "red", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:GND.1`, `${partId}:GND`, "black", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:5`, `${partId}:TRIG`, "green", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:18`, `${partId}:ECHO`, "orange", ["v0"] ]);
+      }
+      curLeft += 220;
+    } else if (modId === 'pir_hc_sr501') {
+      const partId = `pir${idx + 1}`;
+      parts.push({ type: "wokwi-pir-motion-sensor", id: partId, top: curTop + 120, left: curLeft, attrs: {} });
+      if (isArduino) {
+        connections.push([ `${mcuPrefix}:5V`, `${partId}:VCC`, "red", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:GND.1`, `${partId}:GND`, "black", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:3`, `${partId}:OUT`, "green", ["v0"] ]);
+      } else {
+        connections.push([ `${mcuPrefix}:5V`, `${partId}:VCC`, "red", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:GND.1`, `${partId}:GND`, "black", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:19`, `${partId}:OUT`, "green", ["v0"] ]);
+      }
+      curLeft += 200;
+    } else if (modId === 'rf433_tx') {
+      const partId = `rf_tx${idx + 1}`;
+      parts.push({ type: "wokwi-led", id: partId, top: curTop + 140, left: curLeft, attrs: { color: "yellow", label: "RF 433MHz TX" } });
+      if (isArduino) {
+        connections.push([ `${mcuPrefix}:4`, `${partId}:A`, "yellow", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:GND.1`, `${partId}:C`, "black", ["v0"] ]);
+      } else {
+        connections.push([ `${mcuPrefix}:4`, `${partId}:A`, "yellow", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:GND.1`, `${partId}:C`, "black", ["v0"] ]);
+      }
+      curLeft += 180;
+    } else if (modId === 'esp01_modem') {
+      const partId = "esp01";
+      parts.push({ type: "board-esp-01s", id: partId, top: curTop - 40, left: curLeft, attrs: {} });
+      parts.push({ type: "wokwi-resistor", id: "r_1k", top: curTop + 80, left: curLeft - 60, attrs: { value: "1000" } });
+      parts.push({ type: "wokwi-resistor", id: "r_2k", top: curTop + 80, left: curLeft + 20, attrs: { value: "2000" } });
+      if (isArduino) {
+        connections.push([ `${mcuPrefix}:3.3V`, `${partId}:3V3`, "red", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:3.3V`, `${partId}:EN`, "red", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:GND.2`, `${partId}:GND`, "black", ["v0"] ]);
+        connections.push([ `${partId}:TX`, `${mcuPrefix}:10`, "green", ["v0"] ]);
+        connections.push([ `${mcuPrefix}:11`, "r_1k:1", "orange", ["v0"] ]);
+        connections.push([ "r_1k:2", `${partId}:RX`, "orange", ["v0"] ]);
+        connections.push([ "r_1k:2", "r_2k:1", "orange", ["v0"] ]);
+        connections.push([ "r_2k:2", `${mcuPrefix}:GND.2`, "black", ["v0"] ]);
+      }
+      curLeft += 240;
+    }
+  });
+
+  liveWokwiDiagram = {
+    version: 1,
+    author: "Matheus Snake Eco - Wokwi Live Sync",
+    editor: "wokwi",
+    parts,
+    connections
+  };
+
+  const jsonStr = JSON.stringify(liveWokwiDiagram, null, 2);
+  const diagramOutput = document.getElementById('live-diagram-json-output');
+  if (diagramOutput) diagramOutput.value = jsonStr;
+
+  const summaryEl = document.getElementById('wokwi-sync-summary');
+  if (summaryEl) {
+    summaryEl.textContent = `Bancada: ${MCUS[currentMcuId].name} + ${attachedModules.length} módulo(s) • ${parts.length} peças & ${connections.length} fios no Wokwi`;
+  }
+
+  const liveCodeOutput = document.getElementById('live-sketch-code-output');
+  const codeMain = document.getElementById('code-output');
+  if (liveCodeOutput && codeMain) {
+    liveCodeOutput.value = codeMain.textContent;
+  }
+}
+
+function switchWokwiSubTab(tabName) {
+  const simView = document.getElementById('wokwi-view-sim');
+  const diagView = document.getElementById('wokwi-view-diagram');
+  const codeView = document.getElementById('wokwi-view-code');
+
+  const btnSim = document.getElementById('wokwi-tab-sim');
+  const btnDiag = document.getElementById('wokwi-tab-diagram');
+  const btnCode = document.getElementById('wokwi-tab-code');
+
+  if (simView) simView.classList.add('hidden');
+  if (diagView) diagView.classList.add('hidden');
+  if (codeView) codeView.classList.add('hidden');
+
+  const inactiveBtnClass = 'px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition';
+  const activeBtnClass = 'px-3 py-1.5 rounded-lg font-bold bg-cyan-600 text-white shadow transition';
+
+  if (btnSim) btnSim.className = inactiveBtnClass;
+  if (btnDiag) btnDiag.className = inactiveBtnClass;
+  if (btnCode) btnCode.className = inactiveBtnClass;
+
+  if (tabName === 'sim') {
+    if (simView) simView.classList.remove('hidden');
+    if (btnSim) btnSim.className = activeBtnClass;
+  } else if (tabName === 'diagram') {
+    if (diagView) diagView.classList.remove('hidden');
+    if (btnDiag) btnDiag.className = activeBtnClass;
+    generateLiveWokwiState();
+  } else if (tabName === 'code') {
+    if (codeView) codeView.classList.remove('hidden');
+    if (btnCode) btnCode.className = activeBtnClass;
+    generateLiveWokwiState();
+  }
+}
+
+function openWokwiImportModal() {
+  const modal = document.getElementById('modal-import-wokwi');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeWokwiImportModal() {
+  const modal = document.getElementById('modal-import-wokwi');
+  if (modal) modal.classList.add('hidden');
+}
+
+function applyWokwiImport() {
+  const inputEl = document.getElementById('import-wokwi-json-input');
+  if (!inputEl || !inputEl.value.trim()) {
+    showToast('Cole o conteúdo do diagram.json!');
+    return;
+  }
+
+  try {
+    const data = JSON.parse(inputEl.value.trim());
+    if (!data.parts || !Array.isArray(data.parts)) {
+      showToast('Formato inválido: JSON precisa conter a lista "parts"');
+      return;
+    }
+
+    let detectedMcu = 'esp32_wroom_30';
+    const newAttached = [];
+
+    data.parts.forEach(part => {
+      const type = part.type || '';
+      if (type.includes('arduino-uno')) {
+        detectedMcu = 'arduino_uno';
+      } else if (type.includes('esp32')) {
+        detectedMcu = 'esp32_wroom_30';
+      }
+
+      if (type.includes('relay')) newAttached.push('rele_1ch');
+      else if (type.includes('dht22') || type.includes('dht11')) newAttached.push('dht22');
+      else if (type.includes('ssd1306') || type.includes('oled')) newAttached.push('oled_i2c');
+      else if (type.includes('hc-sr04')) newAttached.push('hc_sr04');
+      else if (type.includes('pir')) newAttached.push('pir_hc_sr501');
+      else if (type.includes('esp-01') || type.includes('esp01')) newAttached.push('esp01_modem');
+    });
+
+    currentMcuId = detectedMcu;
+    attachedModules = [...new Set(newAttached)];
+
+    const mcuSelect = document.getElementById('mcu-select');
+    if (mcuSelect) mcuSelect.value = currentMcuId;
+
+    rebuild3dScene();
+    updatePhysicalWiringGuide();
+    generateFirmwareCode();
+    generateLiveWokwiState();
+    renderAttachedModules();
+    savePersistentState();
+    closeWokwiImportModal();
+    logTestEvent(`Projeto importado do Wokwi com ${attachedModules.length} módulos.`);
+    showToast(`Projeto importado! ${MCUS[currentMcuId].name} com ${attachedModules.length} módulos.`);
+  } catch (err) {
+    showToast('Erro ao analisar JSON: verifique a sintaxe.');
+  }
 }
